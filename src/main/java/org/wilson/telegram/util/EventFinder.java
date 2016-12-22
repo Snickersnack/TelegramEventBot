@@ -23,6 +23,7 @@ public class EventFinder {
 		this.event = event;
 	}
 	
+	//searches through map to find event
 	public static EventModel findEvent(EventModel event, HashMap<?, HashSet<EventModel>> map) {
 		EventModel newEvent = event;
 		for (Entry<?, HashSet<EventModel>> item : map.entrySet()) {

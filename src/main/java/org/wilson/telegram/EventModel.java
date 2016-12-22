@@ -19,7 +19,6 @@ public class EventModel {
 	private String eventLocation;
 	private String eventDate;
 	private Long channelId;
-	private Integer messageId;
 
 
 	private HashSet<String> inLineMessageIds;
@@ -36,7 +35,6 @@ public class EventModel {
 		eventDate = null;
 		inLineMessageIds = new HashSet<String>();
 		channelId = null;
-		messageId = null;
 	}
 	
 	public EventModel(String eventName){
@@ -51,7 +49,6 @@ public class EventModel {
 		eventDate = null;
 		inLineMessageIds = new HashSet<String>();
 		channelId = null;
-		messageId = null;
 	}
 	
 	public EventModel(String eventName, String eventDate, String eventLocation, Integer eventHost){
@@ -61,7 +58,6 @@ public class EventModel {
 		attendees = new HashSet<String>();
 		eventInputStage = 0;
 		inLineMessageIds = new HashSet<String>();
-		messageId= null;
 		channelId = null;
 		
 		this.eventName = eventName;
@@ -212,13 +208,6 @@ public class EventModel {
 		this.inLineMessageIds = inLineMessageId;
 	}
 
-	public Integer getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(Integer messageId) {
-		this.messageId = messageId;
-	}
 	
 
 	

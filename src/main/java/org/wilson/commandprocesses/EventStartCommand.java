@@ -1,5 +1,7 @@
 package org.wilson.commandprocesses;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ import org.wilson.telegram.Cache;
 import org.wilson.telegram.EventModel;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.util.EventBuilder;
+import org.wilson.telegram.util.EventFinder;
 
 public class EventStartCommand {
 
@@ -23,6 +26,7 @@ public class EventStartCommand {
 	}
 	
 	public static SendMessage setEventInfo(Message message){
+		//maybe add protection against same user creating event at the same tiem?
 		HashMap<Integer, EventModel> inProgressItem = Cache.getInstance().getInProgressEventCreations();
 		Integer userId = message.getFrom().getId();
 		int stage = inProgressItem.get(userId).getEventInputStage();
@@ -36,7 +40,9 @@ public class EventStartCommand {
 				inProgressEventItem.setEventName(message.getText());
 
 				//If event already exists, request another input
-				if(Cache.getInstance().getUserEventMap().get(userId).contains(inProgressEventItem)){
+				HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getUserEventMap();
+				EventModel temp = EventFinder.findEvent(inProgressEventItem, userMap);
+				if(temp != null){
 					sendMessageRequest.setText("There is already an event with this name. Please try another name");
 				}else{
 					sendMessageRequest.setText("Where is the location of this event?");
@@ -51,8 +57,24 @@ public class EventStartCommand {
 				inProgressItem.put(userId,inProgressEventItem);
 				Cache.getInstance().setInProgressEventCreations(inProgressItem);
 		
+			//date is substring(0,10)
 			}else if(stage == 3){
-				inProgressEventItem.setEventDate(message.getText());
+				try{
+//					String dateInput = "12/21/2016 06:20:30";
+//					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+//					LocalDateTime eventDate = LocalDateTime.parse(dateInput, formatter);
+					
+					String dateInput = message.getText();
+					System.out.println("dateinput: " + dateInput);
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+					LocalDateTime eventDate = LocalDateTime.parse(dateInput, formatter);
+					inProgressEventItem.setEventDate(dateInput);
+
+				}catch(Exception e){
+					System.out.println(e);
+					sendMessageRequest.setText("Please specify the date in the correct format (e.g. 11/21/2017 10:00PM)");
+					return sendMessageRequest;
+				}
 				HashMap<Integer, HashSet<EventModel>> completedEvent = generateNewEvent(message);
 		
 				

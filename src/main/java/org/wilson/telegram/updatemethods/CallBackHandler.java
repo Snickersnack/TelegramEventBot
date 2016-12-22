@@ -58,8 +58,8 @@ public class CallBackHandler extends UpdateHandler {
 		
 		//This isn't a event message or we don't have such an event
 		if (eventModel == null) {
-			System.out.println("event null");
-			return null;
+			editRequest.setText("This event no longer exists :(");
+			return editRequest;
 		}
 		
 		//build the eventtext

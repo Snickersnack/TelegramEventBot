@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import org.wilson.telegram.util.EventFinder;
+
 /**
  */
 
@@ -57,22 +59,22 @@ public class Cache {
 	}
 	
 	public Boolean addChannelEvent(Long channelId, EventModel event){
-		if(!channelEventMap.containsKey(channelId)){
-			HashSet<EventModel> newSet = new HashSet<EventModel>();
+		boolean found = false;
+		if (!channelEventMap.containsKey(channelId)) {
+			HashSet<EventModel> newSet = new HashSet();
 			channelEventMap.put(channelId, newSet);
 		}
-		HashSet<EventModel> channelEventSet = channelEventMap.get(channelId);
-		if(channelEventSet == null){
-			channelEventSet = new HashSet<EventModel>();
-			channelEventMap.put(channelId, channelEventSet);
+		if (channelEventMap.get(channelId).contains(event)) {
+			found = true;
 		}
-		Boolean added = channelEventSet.add(event);
-		if(added){
-			HashMap<Long, HashSet<EventModel>> map = getChannelEventMap();
-			map.put(channelId, channelEventSet);
-			setChannelEventMap(map);
+
+		if (!found) {
+			EventModel newEvent = EventFinder.findEvent(event, userEventMap);
+			newEvent.setChannelId(channelId);
+			HashSet<EventModel> channelSet = channelEventMap.get(channelId);
+			channelSet.add(newEvent);
 		}
-		return added;
+		return found;
 		
 	}
 	public Boolean addEventMapEvent(Integer userId, EventModel event){
@@ -95,7 +97,6 @@ public class Cache {
 		
 	}
 	
-	//TODO Add event hosts back to 
 	public void clearUserEvents(Integer userId){
 		userEventMap.put(userId, new HashSet<EventModel>());
 		

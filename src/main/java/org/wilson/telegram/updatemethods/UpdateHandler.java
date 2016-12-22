@@ -17,6 +17,7 @@ import org.wilson.telegram.Cache;
 import org.wilson.telegram.EventModel;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EditTextCallback;
+import org.wilson.telegram.util.CacheUpdater;
 import org.wilson.telegram.util.EventFinder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,7 +64,7 @@ public class UpdateHandler extends TelegramLongPollingBot {
 		SendMessage sendMessageRequest = new SendMessage();
 		
 		if(update.hasChosenInlineQuery()){		
-			updateCacheId(update);
+			CacheUpdater.updateInlineId(update);
 		}
 		else if (update.hasInlineQuery()) {
 			InlineQueryHandler iq = new InlineQueryHandler();
@@ -127,35 +128,7 @@ public class UpdateHandler extends TelegramLongPollingBot {
 
 	}
 
-	private void updateCacheId(Update update){
-		String resultId = update.getChosenInlineQuery().getResultId();
-		String inLineMessageId = update.getChosenInlineQuery().getInlineMessageId();
 
-		
-		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getUserEventMap();
-		EventModel tempEvent = new EventModel(resultId);
-		EventModel foundEvent = EventFinder.findEvent(tempEvent, map);
-		
-		//search based on the ResultId
-		HashSet<String> set = foundEvent.getInLineMessageId();
-		set.add(inLineMessageId);
-
-		
-//		for(Entry<Integer, HashSet<EventModel>> entry : map.entrySet()){
-//			if(!entry.getValue().isEmpty()){
-//				for(EventModel event : entry.getValue()){
-//					if(event.getEventName().equals(resultId)){
-//						HashSet<String> set = event.getInLineMessageId();
-//						set.add(inLineMessageId);
-////						event.setInLineMessageId(set);
-//						return;
-//					}
-//				}
-//			}
-//		}
-		
-		
-	}
 	@Override
 	public String getBotUsername() {
 		// TODO Auto-generated method stub

@@ -1,23 +1,19 @@
 package org.wilson.telegram.updatemethods;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.commandprocesses.EventStartCommand;
 import org.wilson.telegram.Cache;
 import org.wilson.telegram.EventModel;
+import org.wilson.telegram.config.AvailableCommands;
 import org.wilson.telegram.config.BotConfig;
-import org.wilson.telegram.config.Commands;
+import org.wilson.telegram.util.CacheUpdater;
 
 /**
  * Service to parse commands
@@ -62,7 +58,7 @@ public class MessageHandler extends UpdateHandler {
 			}
 		}
 
-		else if (command.startsWith(Commands.DELETEEVENTSCOMMAND)) {
+		else if (command.startsWith(AvailableCommands.DELETEEVENTSCOMMAND)) {
 			sendMessageRequest.setChatId(message.getChatId());
 			String eventName = command.substring(7);
 			if (message.isUserMessage()) {
@@ -72,9 +68,8 @@ public class MessageHandler extends UpdateHandler {
 				Iterator<EventModel> it = set.iterator();
 				while (it.hasNext()) {
 					EventModel event = it.next();
-					if (event.getEventName().toLowerCase()
-							.equals(eventName.toLowerCase())) {
-						set.remove(event);
+					if (event.getEventName().toLowerCase().equals(eventName.toLowerCase())) {
+						it.remove();
 						break;
 					}
 				}
@@ -85,7 +80,7 @@ public class MessageHandler extends UpdateHandler {
 			} else {
 				sendMessageRequest.setText("Events must be deleted privately");
 			}
-		} else if (command.startsWith(Commands.CLEAREVENTSCOMMAND)) {
+		} else if (command.startsWith(AvailableCommands.CLEAREVENTSCOMMAND)) {
 			sendMessageRequest.setChatId(message.getChatId());
 			if (message.isUserMessage()) {
 				Cache.getInstance().clearUserEvents(message.getFrom().getId());
@@ -94,7 +89,7 @@ public class MessageHandler extends UpdateHandler {
 				sendMessageRequest.setText("Events must be cleared privately");
 			}
 
-		} else if (command.startsWith(Commands.HELPCOMMAND)
+		} else if (command.startsWith(AvailableCommands.HELPCOMMAND)
 				&& command.substring(0, 5).equals("/help")) {
 
 		}
@@ -102,7 +97,7 @@ public class MessageHandler extends UpdateHandler {
 		// else if(command.equals(Commands.TESTCOMMAND)){
 		//
 		// }
-		else if (command.equals(Commands.VIEWCOMMAND)) {
+		else if (command.equals(AvailableCommands.VIEWCOMMAND)) {
 			boolean eventsSent = sendViewCommand(message.getChatId());
 			if (!eventsSent) {
 				sendMessageRequest
@@ -112,12 +107,11 @@ public class MessageHandler extends UpdateHandler {
 				return null;
 			}
 
-		} else if (command.startsWith(Commands.STARTCOMMAND)) {
+		} else if (command.startsWith(AvailableCommands.STARTCOMMAND)) {
 			// See if user is already creating an event
 			if (inProgressCache.get(userId) != null) {
 				sendMessageRequest.setChatId(message.getChatId());
-				sendMessageRequest
-						.setText("Event creation already in progress");
+				sendMessageRequest.setText("Event creation already in progress");
 			}
 			// Check if we are in a group chat
 			else if (message.getChat().isUserChat()) {
@@ -134,8 +128,7 @@ public class MessageHandler extends UpdateHandler {
 				if (map.get(userId) == null) {
 					map.put(userId, new HashSet<EventModel>());
 				}
-				Cache.getInstance()
-						.setInProgressEventCreations(inProgressCache);
+				Cache.getInstance().setInProgressEventCreations(inProgressCache);
 				sendMessageRequest.setChatId(message.getChatId());
 				sendMessageRequest.setText("What is the name of your event?");
 			} else {
@@ -143,67 +136,16 @@ public class MessageHandler extends UpdateHandler {
 				sendMessageRequest.setText("Events must be created privately");
 			}
 
-			// update our event list every time we see an event posted on
+			// update our event list every time we see an event posted
 		} else {
-			updateChannelEventMap();
+			CacheUpdater.updateChannelEventMap(message);
 		}
 
 		return sendMessageRequest;
 
 	}
 
-	private void updateChannelEventMap() {
-		String[] arr = command.split("\\r?\\n");
-		String eventName = arr[0];
-		String eventDate = arr[1];
-		String eventLocation = arr[2];
-		String attendeesList = arr[3];
-		Integer user = message.getFrom().getId();
-		Long channelId = message.getChatId();
-		EventModel newEvent = new EventModel(eventName, eventDate,
-				eventLocation, user);
 
-		// is it already in channelMap?
-		// if not find and populate channelmap
-
-		boolean found = false;
-		HashMap<Long, HashSet<EventModel>> channelEventMap = Cache.getInstance().getChannelEventMap();
-		if (!channelEventMap.containsKey(channelId)) {
-			HashSet<EventModel> newSet = new HashSet();
-			channelEventMap.put(channelId, newSet);
-		}
-		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getUserEventMap();
-		newEvent = findEvent(newEvent, map);
-		newEvent.setMessageId(message.getMessageId());
-		newEvent.setChannelId(message.getChatId());
-		if (Cache.getInstance().getChannelEventMap().get(message.getChatId())
-				.contains(newEvent)) {
-			found = true;
-		}
-
-		if (!found) {
-			HashSet<EventModel> channelSet = Cache.getInstance()
-					.getChannelEventMap().get(channelId);
-			channelSet.add(newEvent);
-		}
-
-	}
-
-	private EventModel findEvent(EventModel newEvent,
-			HashMap<?, HashSet<EventModel>> map) {
-		for (Entry<?, HashSet<EventModel>> item : map.entrySet()) {
-			HashSet<EventModel> set = item.getValue();
-			if (set.contains(newEvent)) {
-				for (EventModel userEvent : set) {
-					if (userEvent.equals(newEvent)) {
-						newEvent = userEvent;
-						return newEvent;
-					}
-				}
-			}
-		}
-		return null;
-	}
 
 	private boolean sendViewCommand(Long channelId) {
 		HashMap<Long, HashSet<EventModel>> channelMap = Cache.getInstance()

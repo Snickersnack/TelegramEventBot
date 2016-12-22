@@ -1,11 +1,7 @@
 package org.wilson.telegram;
 
-import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.TelegramBotsApi;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
-import org.telegram.telegrambots.logging.BotLogger;
-import org.wilson.telegram.updatemethods.UpdateHandler;
+import org.wilson.telegram.util.DateScheduler;
 
 /**
  * Main initialization class
@@ -15,14 +11,10 @@ import org.wilson.telegram.updatemethods.UpdateHandler;
 public class Main {
 
     public static void main(String[] args) throws TelegramApiRequestException {
-    	ApiContextInitializer.init();
-        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-        try {
-            telegramBotsApi.registerBot(new UpdateHandler());
-        } catch (TelegramApiException e) {
-            BotLogger.error("Error: ", e);
-        }
-        
-
+    	TelegramInitiator telegram = new TelegramInitiator();
+    	Thread bot = new Thread(telegram);
+    	bot.start();
+        Thread dateThread = new Thread(new DateScheduler());
+        dateThread.start();
     }
 }
