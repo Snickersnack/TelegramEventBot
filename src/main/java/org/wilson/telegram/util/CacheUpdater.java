@@ -5,18 +5,21 @@ import java.util.HashSet;
 
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
-import org.wilson.telegram.Cache;
-import org.wilson.telegram.EventModel;
+import org.wilson.telegram.client.Cache;
+import org.wilson.telegram.models.EventModel;
 
-public class CacheUpdater {
+public final class CacheUpdater {
 
+	private CacheUpdater(){
+		
+	}
 	
 	public static void updateInlineId(Update update){
 		String resultId = update.getChosenInlineQuery().getResultId();
 		String inLineMessageId = update.getChosenInlineQuery().getInlineMessageId();
 
 		
-		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getUserEventMap();
+		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
 		EventModel tempEvent = new EventModel(resultId);
 		EventModel foundEvent = EventFinder.findEvent(tempEvent, map);
 		

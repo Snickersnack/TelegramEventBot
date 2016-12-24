@@ -2,60 +2,58 @@ package org.wilson.telegram.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import org.wilson.telegram.Cache;
-import org.wilson.telegram.EventModel;
+import org.wilson.telegram.client.Cache;
+import org.wilson.telegram.config.BotConfig;
+import org.wilson.telegram.models.EventModel;
 
 public class DateEventCleanup implements Runnable{
 
-	HashMap<Integer, HashSet<EventModel>> userMap;
-	HashMap<Long, HashSet<EventModel>> channelMap;
-	LocalDateTime currentTime;
-
+	private Map<Integer, HashSet<EventModel>> userMap;
+	private Map<Long, HashSet<EventModel>> channelMap;
+	private LocalDateTime currentTime;
+	final Long EXPIRATION_TIME = (24*60*60) * BotConfig.SCHEDULED_REMOVAL_DAYS;
+	final ZoneId ZONE_ID = ZoneId.of(BotConfig.TIME_ZONE);
 	
 	public void run(){
+		try{
 		currentTime = DateUtil.getCurrentTime();
-//		LocalDate currentDay = currentTime.toLocalDate();
-		LocalTime currentDay = currentTime.toLocalTime();
-		userMap = Cache.getInstance().getUserEventMap();
+		LocalDate currentDay = currentTime.toLocalDate();
+		long currentSeconds = currentDay.atStartOfDay(ZONE_ID).toEpochSecond();
+
+		userMap = Cache.getInstance().getMasterEventMap();
 
 		for(Entry<Integer, HashSet<EventModel>> userItem : userMap.entrySet()){
 			HashSet<EventModel> eventSet = userItem.getValue();
 			Iterator<EventModel> it = eventSet.iterator();
-			try{
 				while(it.hasNext()){
 					EventModel event = it.next();
 					String stringDate = event.getEventDate();
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"); 
-					System.out.println("This is the broken date: " + stringDate);
-					LocalTime eventDate = LocalTime.parse(stringDate, formatter);
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy"); 
+					LocalDate eventDate = LocalDate.parse(stringDate, formatter);
+					long eventSeconds = eventDate.atStartOfDay(ZONE_ID).toEpochSecond();
 					
-					if(currentDay.until(eventDate, ChronoUnit.SECONDS) <= -40){
+					System.out.println("currentSeconds: " + currentSeconds + "eventSeconds = " + eventSeconds);
+					if(currentSeconds - eventSeconds >= EXPIRATION_TIME){
 						System.out.println("removed event: " + event.getEventName());
 						it.remove();
 					}
-//					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy"); 
-//					LocalDate eventDate = LocalDate.parse(stringDate, formatter);
-//					if(currentDay.compareTo(eventDate) >= BotConfig.SCHEDULEDTIMEEVENTREMOVAL){
-//						it.remove();
-//					}
 					
-
 				}
-			}catch(Exception e){
-				System.out.println(e);
-			}
-		}
 
+			}
+		}catch(Exception e){
+			System.out.println(e);
+		}
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 		System.out.println("Events cleaned! Current Time: " + dateFormat.format(date));

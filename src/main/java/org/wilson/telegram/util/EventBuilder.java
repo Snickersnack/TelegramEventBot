@@ -2,7 +2,7 @@ package org.wilson.telegram.util;
 
 import java.util.HashSet;
 
-import org.wilson.telegram.EventModel;
+import org.wilson.telegram.models.EventModel;
 
 public class EventBuilder {
 	
@@ -27,6 +27,10 @@ public class EventBuilder {
 				counter++;
 			}
 		}
+		
+		//EDITING EVENT NAME HERE COULD CAUSE OUR CACHE TO NOT UPDATE
+
+		
 		eventText = "<strong>" + eventName + "</strong>"
 				+ System.getProperty("line.separator") + eventDate
 				+ System.getProperty("line.separator") + "📍" + eventLocation

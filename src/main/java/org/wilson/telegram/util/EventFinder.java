@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
-import org.wilson.telegram.Cache;
-import org.wilson.telegram.EventModel;
+import org.wilson.telegram.client.Cache;
+import org.wilson.telegram.models.EventModel;
 
 
 //Use this to locate eventModels in our cache
@@ -26,12 +26,14 @@ public class EventFinder {
 	//searches through map to find event
 	public static EventModel findEvent(EventModel event, HashMap<?, HashSet<EventModel>> map) {
 		EventModel newEvent = event;
+		System.out.println("starting event search: " + event.getEventName());
+		Cache.getInstance().listAllEvents(event.getEventName());
 		for (Entry<?, HashSet<EventModel>> item : map.entrySet()) {
 			HashSet<EventModel> set = item.getValue();
 			if (set.contains(newEvent)) {
-				for (EventModel userEvent : set) {
-					if (userEvent.equals(newEvent)) {
-						newEvent = userEvent;
+				for (EventModel eventItem : set) {
+					if (eventItem.equals(newEvent)) {
+						newEvent = eventItem;
 						return newEvent;
 					}
 				}
@@ -41,7 +43,7 @@ public class EventFinder {
 	}
 	
 	public static EventModel findEventByInlineMessageId(String inLineMessageId) {
-		HashMap<Integer, HashSet<EventModel>>map = Cache.getInstance().getUserEventMap();
+		HashMap<Integer, HashSet<EventModel>>map = Cache.getInstance().getMasterEventMap();
 		EventModel eventModel = new EventModel();
 		for (Entry<?, HashSet<EventModel>> entry : map.entrySet()) {
 			if (!entry.getValue().isEmpty()) {

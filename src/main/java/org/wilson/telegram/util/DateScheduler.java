@@ -15,26 +15,29 @@ import org.wilson.telegram.config.BotConfig;
 public class DateScheduler implements Runnable {
 
 	public void run(){
-		System.out.println("starting thread");
+		try{
+			
+		
 		LocalDateTime date = DateUtil.getCurrentTime();
-		ZoneId currentZone = ZoneId.of(BotConfig.TIMEZONE);
+		ZoneId currentZone = ZoneId.of(BotConfig.TIME_ZONE);
 		ZonedDateTime zonedNow = ZonedDateTime.of(date, currentZone);
         ZonedDateTime zonedNextDay ;
-//        zonedNextDay = zonedNow.withHour(0).withMinute(0).withSecond(0);
-        zonedNextDay = zonedNow.plusSeconds(10);
+        zonedNextDay = zonedNow.withHour(0).withMinute(0).withSecond(0);
+//        zonedNextDay = zonedNow.plusSeconds(10);
         if(zonedNow.compareTo(zonedNextDay) > 0){
-            System.out.println(zonedNextDay);
-//        	zonedNextDay = zonedNextDay.plusDays(1);
-        	zonedNextDay = zonedNextDay.plusSeconds(10);
+        	zonedNextDay = zonedNextDay.plusDays(1);
+            System.out.println("Next event cleanup: " + zonedNextDay);
+//        	zonedNextDay = zonedNextDay.plusSeconds(10);
 
         }        
         Duration duration = Duration.between(zonedNow, zonedNextDay);
         long initialDelay = duration.getSeconds();
         
-
-     //   24*60*60
 	    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);            
-	    scheduler.scheduleAtFixedRate(new DateEventCleanup(), initialDelay,  20, TimeUnit.SECONDS);
+	    scheduler.scheduleAtFixedRate(new DateEventCleanup(), initialDelay,  24*60*60, TimeUnit.SECONDS);
+		}catch(Exception e){
+			System.out.println(e);
+		}
 	}
 
 }
