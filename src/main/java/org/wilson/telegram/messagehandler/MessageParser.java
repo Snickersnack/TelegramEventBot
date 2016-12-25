@@ -2,13 +2,14 @@ package org.wilson.telegram.messagehandler;
 
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.client.UpdateHandler;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.templates.Commands;
+import org.wilson.telegram.util.KeyboardBuilder;
 
 /**
  * Service to parse commands
@@ -41,19 +42,48 @@ public class MessageParser extends UpdateHandler {
 		command = message.getText().toLowerCase();
 		sendMessageRequest.setChatId(message.getChatId());
 		sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+		
+		
 		//Check for user commands
-		if(message.isUserMessage()){
+		
+		if (command.startsWith(Commands.HELPCOMMAND)
+				&& command.substring(0, 5).equals("/help")) {
+//			String helpText = ""
+			
+		}
+		else if(message.isUserMessage()){
+			if(command.startsWith(Commands.VIEWCOMMAND)){
+				String text = "View lists all events shared to a channel, not a user. Use /view in a channel";
+				sendMessageRequest.setText(text);
+			}else{
 				UserMessageHelper userMessage = new UserMessageHelper(sendMessageRequest);
-				return userMessage.parse(message);	
+				return userMessage.parse(message);		
+			}
+
 							
 			
 		//Else it is a group command
 		}else{
 
-			if(command.startsWith(Commands.STARTCOMMAND) || command.startsWith(Commands.DELETEEVENTSCOMMAND) 
+			if(command.startsWith(Commands.STARTCOMMAND) ){
+				
+				sendMessageRequest.setText("Message @EvePlannerBot directly to use this command or click below");
+				KeyboardBuilder keyboard = new KeyboardBuilder(1,1);
+				InlineKeyboardButton button = new InlineKeyboardButton();
+				button.setText("Create events here");
+				button.setSwitchInlineQueryCurrentChat(" ");
+				keyboard.addButton(button);
+				InlineKeyboardMarkup markup = keyboard.buildMarkup();
+				sendMessageRequest.setReplyMarkup(markup);
+				
+			}
+			
+			else if(command.startsWith(Commands.DELETEEVENTSCOMMAND) 
 					|| command.startsWith(Commands.CLEAREVENTSCOMMAND) || command.startsWith(Commands.EDITCOMMAND) 
 					|| command.startsWith(Commands.CANCELCOMMAND)){
-				sendMessageRequest.setText("<i>Message bot directly to create, edit and remove events</i>");
+				
+				sendMessageRequest.setText("Message @EvePlannerBot directly to use this command");
+
 			}
 			else{
 				

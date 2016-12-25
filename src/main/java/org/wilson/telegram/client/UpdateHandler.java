@@ -9,12 +9,14 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.wilson.telegram.callbackhandler.DeleteEventHandler;
 import org.wilson.telegram.callbackhandler.EditEventHandler;
 import org.wilson.telegram.callbackhandler.EditTextCallback;
 import org.wilson.telegram.callbackhandler.InvitationHandler;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.inlinequeryhandler.InlineQueryHandler;
 import org.wilson.telegram.messagehandler.MessageParser;
+import org.wilson.telegram.templates.EventDelete;
 import org.wilson.telegram.templates.EventEdit;
 import org.wilson.telegram.util.CacheUpdater;
 
@@ -60,7 +62,8 @@ public class UpdateHandler extends TelegramLongPollingBot {
 			throws TelegramApiException {
 		
 		
-		if(update.hasChosenInlineQuery()){		
+		if(update.hasChosenInlineQuery()){
+			System.out.println("WTF");
 			CacheUpdater.updateInlineId(update);
 		}
 		else if (update.hasInlineQuery()) {
@@ -73,11 +76,17 @@ public class UpdateHandler extends TelegramLongPollingBot {
 			String data = callback.getData();
 			String[] dataArray = data.split(" ");
 			EditMessageText editMessageRequest = new EditMessageText();
+			String callbackType = dataArray[0];
+			
 			if(dataArray[0].equals(EventEdit.EDITTYPE)){
 				EditEventHandler editor = new EditEventHandler(update);
 				editMessageRequest = editor.handleCallbackQuery();
 				
-			}else{
+			}else if(dataArray[0].equals(EventDelete.DELETETYPE)){
+				DeleteEventHandler deleteEvent = new DeleteEventHandler(update);
+				editMessageRequest = deleteEvent.handleCallbackQuery();
+			}
+			else{
 				InvitationHandler invite = new InvitationHandler(update);
 				editMessageRequest = invite.handleCallbackQuery();
 			}
@@ -100,7 +109,7 @@ public class UpdateHandler extends TelegramLongPollingBot {
 				e.printStackTrace();
 			}
 
-			}
+		}
 		return null;
 
 	}

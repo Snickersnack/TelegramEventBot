@@ -26,7 +26,7 @@ public class GroupMessageHelper extends MessageParser{
 		String command = message.getText();
 		
 		
-		if (command.equals(Commands.VIEWCOMMAND)) {
+		if (command.startsWith(Commands.VIEWCOMMAND)) {
 			boolean eventsSent = sendViewCommand(message.getChatId());
 			if (!eventsSent) {
 				sendMessageRequest.setText("There are no events shared to this channel");
@@ -35,11 +35,7 @@ public class GroupMessageHelper extends MessageParser{
 			}
 
 		} 
-		else if (command.startsWith(Commands.HELPCOMMAND)
-				&& command.substring(0, 5).equals("/help")) {
 
-			
-		}
 		else {
 			System.out.println("updating cache");
 			CacheUpdater.updateChannelEventMap(message);

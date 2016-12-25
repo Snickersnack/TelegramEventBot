@@ -52,8 +52,7 @@ public class InvitationHandler extends UpdateHandler {
 			
 			//we are editing an event sent from /view
 			String eventName = callBack.getMessage().getText().split("\\r?\\n")[0];
-			EventModel event = new EventModel(eventName);
-			eventModel = EventFinder.findEvent(event, Cache.getInstance().getChannelEventMap());
+			eventModel = EventFinder.findEventbyName(eventName);
 			
 			editRequest.setMessageId(callBack.getMessage().getMessageId());
 			editRequest.setChatId(eventModel.getChannelId());
@@ -105,16 +104,16 @@ public class InvitationHandler extends UpdateHandler {
 		response = responseArray[0];
 		
 		if (response.equals("Yes")) {
-			if (!eventModel.getAttendees().contains(userFirst)) {
 				attendees.add(userFirst);
-				responses.add(userFirst);
-			} 
+				System.out.println("adding response on a yes: ");
+				System.out.println(responses.add(userFirst));
+			 
 		} else {
-			if (eventModel.getAttendees().contains(userFirst)) {
 				attendees.remove(userFirst);
-				responses.add(userFirst);
+				System.out.println("adding response on a no: ");
+				System.out.println(responses.add(userFirst));
 
-			} 
+			
 		}
 		return attendees;
 	}

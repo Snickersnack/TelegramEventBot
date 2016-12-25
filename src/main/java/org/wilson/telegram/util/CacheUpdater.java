@@ -18,10 +18,10 @@ public final class CacheUpdater {
 		String resultId = update.getChosenInlineQuery().getResultId();
 		String inLineMessageId = update.getChosenInlineQuery().getInlineMessageId();
 
-		
 		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
-		EventModel tempEvent = new EventModel(resultId);
+		EventModel tempEvent = new EventModel(Long.parseLong(resultId));
 		EventModel foundEvent = EventFinder.findEvent(tempEvent, map);
+//		Cache.getInstance().listAllEvents(Long.parseLong(resultId));
 		
 		//search based on the ResultId
 		HashSet<String> set = foundEvent.getInLineMessageId();
@@ -40,10 +40,20 @@ public final class CacheUpdater {
 		Integer user = message.getFrom().getId();
 		Long channelId = message.getChatId();
 		EventModel newEvent = new EventModel(eventName, eventDate,eventLocation, user);
-
+		
+		HashMap<Long, HashSet<EventModel>> channelMap = Cache.getInstance().getChannelEventMap();
+		if(!channelMap.containsKey(channelId)){
+			channelMap.put(channelId, new HashSet<EventModel>());
+		}
+		HashSet<EventModel> channelSet = channelMap.get(channelId);
+		
+		
+		
+		newEvent = EventFinder.findEventbyName(eventName);
+		newEvent.setChannelId(channelId);
+		channelSet.add(newEvent);
 		// is it already in channelMap?
-		// if not find and populate channelmap
-		Cache.getInstance().addChannelEvent(channelId, newEvent);
+		// if not find and add to channelMap from userMap (linking events)
 		System.out.println("event added: " + eventName);
 	}
 }

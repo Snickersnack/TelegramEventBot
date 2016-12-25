@@ -29,6 +29,7 @@ public class InlineQueryHandler {
 		AnswerInlineQuery aQuery = new AnswerInlineQuery();
 		List<InlineQueryResult> list = new ArrayList<>();
 		HashMap<Integer, HashSet<EventModel>> cachedEvents = Cache.getInstance().getMasterEventMap();
+			
 		
 		//Searches on the userEventMap
 		HashSet<EventModel> userSet = cachedEvents.get(userId);
@@ -44,13 +45,14 @@ public class InlineQueryHandler {
 				InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 				markup.setKeyboard(event.getEventGrid());
 				qResultArticle.setReplyMarkup(markup);
-				qResultArticle.setId(event.getEventName());
+				qResultArticle.setId(event.getEventId().toString());
 				qResultArticle.setTitle(event.getEventName());
 				list.add(qResultArticle);
 			
 			}	
 
 		}
+		
 		
 		
 		//build our response
@@ -63,9 +65,14 @@ public class InlineQueryHandler {
 			sb.append(entry.getKey() + ": " + setString);
 			setString= "";
 		}
+		
 		aQuery.setInlineQueryId(iQuery.getId());
-		aQuery.setSwitchPmText("Click here to create event");
-		aQuery.setSwitchPmParameter("/event");
+
+			
+		aQuery.setSwitchPmText("Create an event");
+		aQuery.setSwitchPmParameter("/start");
+
+		
 		aQuery.setResults(list);
 		aQuery.setCacheTime(1);
 		

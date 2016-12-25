@@ -17,7 +17,7 @@ public final class Commands {
     public static final String VIEWCOMMAND = INIT_CHAR + "view";
     public static final String EDITCOMMAND = INIT_CHAR + "edit";
     public static final String CANCELCOMMAND = INIT_CHAR + "cancel";
-    public static final String VIEWATTENDEESCOMMAND = INIT_CHAR + "viewattendees";
+    public static final String RESPONDEESCOMMAND = INIT_CHAR + "respondees";
 
 
 

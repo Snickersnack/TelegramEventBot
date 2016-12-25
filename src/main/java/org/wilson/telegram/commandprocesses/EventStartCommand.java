@@ -40,8 +40,7 @@ public class EventStartCommand {
 				inProgressEventItem.setEventName(message.getText());
 
 				//If event already exists, request another input
-				HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
-				EventModel temp = EventFinder.findEvent(inProgressEventItem, userMap);
+				EventModel temp = EventFinder.findEventbyName(inProgressEventItem.getEventName());
 				if(temp != null){
 					sendMessageRequest.setText("There is already an event with this name. Please try another name");
 				}else{
@@ -135,6 +134,7 @@ public class EventStartCommand {
 		newEvent.setEventText(event);
 		newEvent.setEventHost(userId);
 		newEvent.setEventHostFirst(message.getFrom().getFirstName());
+		newEvent = Cache.getInstance().registerEvent(newEvent);
 		mapSet.add(newEvent);
 		
 		return map;

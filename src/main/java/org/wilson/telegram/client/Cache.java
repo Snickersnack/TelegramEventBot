@@ -15,11 +15,11 @@ import org.wilson.telegram.util.EventFinder;
 public class Cache {
 
 	private static Cache cache = new Cache();
-	private HashMap<Integer, HashSet<EventModel>> masterEventMap;
+	private HashMap<Integer, HashSet<EventModel>> masterEventMap; //keyed to users
 	private HashMap<Integer, EventModel> inProgressEventCreations;
 	private HashMap<Integer, EditModel> inProgressEdit;
 	private HashMap<Long, HashSet<EventModel>> channelEventMap;
-	
+	private Long globalEventId;
 
 	
 
@@ -29,6 +29,7 @@ public class Cache {
 		setChannelEventMap(new HashMap<Long, HashSet<EventModel>>() );
 		setInProgressEventCreations(new HashMap<Integer, EventModel>());
 		setInProgressEdit(new HashMap<Integer, EditModel>());
+		globalEventId = 1L; //resultId CANNOT be 0
 	}
 
 	public static Cache getInstance() {
@@ -71,28 +72,15 @@ public class Cache {
 		this.inProgressEdit = inProgressEdit;
 	}
 
-	public Boolean addChannelEvent(Long channelId, EventModel event){
-		boolean found = false;
-		if (!channelEventMap.containsKey(channelId)) {
-			HashSet<EventModel> newSet = new HashSet();
-			channelEventMap.put(channelId, newSet);
-		}
-		if (channelEventMap.get(channelId).contains(event)) {
-			found = true;
-		}
-
-		if (!found) {
-			EventModel newEvent = EventFinder.findEvent(event, masterEventMap);
-			newEvent.setChannelId(channelId);
-			HashSet<EventModel> channelSet = channelEventMap.get(channelId);
-			channelSet.add(newEvent);
-		}
-		return found;
-		
+	
+	public EventModel registerEvent(EventModel event){
+		event.setEventId(globalEventId);
+		globalEventId++;
+		return event;
 	}
 	
-	public void listAllEvents(String name){
-		EventModel test = new EventModel(name);
+	public void listAllEvents(Long id){
+		EventModel test = new EventModel(id);
 
 		for(Entry<Integer, HashSet<EventModel>> item : masterEventMap.entrySet()){
 			if(item.getValue().contains(test)){

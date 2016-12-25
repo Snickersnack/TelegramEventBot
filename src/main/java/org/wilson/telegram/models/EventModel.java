@@ -3,14 +3,13 @@ package org.wilson.telegram.models;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 public class EventModel {
 
-	private Integer eventId;
+	private Long eventId;
 	private String eventText;
 	private List<List<InlineKeyboardButton>> eventGrid;
 	private Integer eventHost;
@@ -39,10 +38,11 @@ public class EventModel {
 		eventDate = null;
 		inLineMessageIds = new HashSet<String>();
 		channelId = null;
+		this.eventId = null;
 	}
 	
-	public EventModel(String eventName){
-		this.eventName = eventName;
+	public EventModel(Long eventId){
+		this.eventName = null;
 		eventText = null;
 		eventGrid = new ArrayList<List<InlineKeyboardButton>>();
 		eventHost = null;
@@ -54,6 +54,7 @@ public class EventModel {
 		eventDate = null;
 		inLineMessageIds = new HashSet<String>();
 		channelId = null;
+		this.eventId = eventId;
 	}
 	
 	public EventModel(String eventName, String eventDate, String eventLocation, Integer eventHost){
@@ -65,6 +66,7 @@ public class EventModel {
 		eventInputStage = 0;
 		inLineMessageIds = new HashSet<String>();
 		channelId = null;
+		this.eventId = null;
 		
 		this.eventName = eventName;
 		this.eventDate = eventDate;
@@ -191,11 +193,11 @@ public class EventModel {
 		this.totalResponses = totalResponses;
 	}
 
-	public Integer getEventId() {
+	public Long getEventId() {
 		return eventId;
 	}
 
-	public void setEventId(Integer eventId) {
+	public void setEventId(Long eventId) {
 		this.eventId = eventId;
 	}
 
