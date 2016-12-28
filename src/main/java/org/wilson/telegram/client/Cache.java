@@ -1,5 +1,6 @@
 package org.wilson.telegram.client;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -7,7 +8,6 @@ import java.util.Map.Entry;
 
 import org.wilson.telegram.models.EditModel;
 import org.wilson.telegram.models.EventModel;
-import org.wilson.telegram.util.EventFinder;
 
 /**
  */
@@ -20,6 +20,7 @@ public class Cache {
 	private HashMap<Integer, EditModel> inProgressEdit;
 	private HashMap<Long, HashSet<EventModel>> channelEventMap;
 	private Long globalEventId;
+	private LocalDateTime currentTime;
 
 	
 
@@ -30,6 +31,7 @@ public class Cache {
 		setInProgressEventCreations(new HashMap<Integer, EventModel>());
 		setInProgressEdit(new HashMap<Integer, EditModel>());
 		globalEventId = 1L; //resultId CANNOT be 0
+		currentTime = null;
 	}
 
 	public static Cache getInstance() {
@@ -73,6 +75,14 @@ public class Cache {
 	}
 
 	
+	public LocalDateTime getCurrentTime() {
+		return currentTime;
+	}
+
+	public void setCurrentTime(LocalDateTime currentTime) {
+		this.currentTime = currentTime;
+	}
+
 	public EventModel registerEvent(EventModel event){
 		event.setEventId(globalEventId);
 		globalEventId++;

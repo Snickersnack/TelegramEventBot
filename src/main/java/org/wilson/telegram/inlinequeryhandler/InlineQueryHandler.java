@@ -69,7 +69,7 @@ public class InlineQueryHandler {
 		aQuery.setInlineQueryId(iQuery.getId());
 
 			
-		aQuery.setSwitchPmText("Create an event");
+		aQuery.setSwitchPmText("Create an Event");
 		aQuery.setSwitchPmParameter("/start");
 
 		

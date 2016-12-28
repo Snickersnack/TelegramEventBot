@@ -112,7 +112,7 @@ public class DeleteEventHandler extends UpdateHandler{
 				editRequest.setParseMode("HTML");
 				return editRequest;
 			}
-			sb.append("Confirm deletion of <i>" + event.getEventName() + "</i>");
+			sb.append("Are you sure you want to delete <i>" + event.getEventName() + "</i>?");
 			KeyboardBuilder keyboardBuilder = new KeyboardBuilder(1,2);
 			
 			

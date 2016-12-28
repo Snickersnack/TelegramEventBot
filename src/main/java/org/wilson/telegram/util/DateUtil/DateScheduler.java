@@ -1,4 +1,4 @@
-package org.wilson.telegram.util;
+package org.wilson.telegram.util.DateUtil;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;

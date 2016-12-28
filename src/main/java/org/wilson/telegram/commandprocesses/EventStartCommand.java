@@ -1,12 +1,12 @@
 package org.wilson.telegram.commandprocesses;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.User;
@@ -28,9 +28,24 @@ public class EventStartCommand {
 	}
 	
 	public static SendMessage start(User user, Long chatId){
+		
 		SendMessage sendMessageRequest = new SendMessage();
-		EventModel newEvent = new EventModel();
+		sendMessageRequest.setChatId(chatId);
+		sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 		Integer userId = user.getId();
+		
+		
+		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
+		if (map.get(userId) == null) {
+			map.put(userId, new HashSet<EventModel>());
+		}
+		if(map.get(userId).size() >= BotConfig.MAX_EVENTS){
+			System.out.println(map.get(userId).size());
+			sendMessageRequest.setText("You can only have " + BotConfig.MAX_EVENTS + " events at a time. Please clear or delete your events");
+			return sendMessageRequest;
+		}
+		
+		EventModel newEvent = new EventModel();
 		newEvent.setEventHostFirst(user.getFirstName());
 		newEvent.setEventInputStage(1);
 
@@ -38,10 +53,7 @@ public class EventStartCommand {
 
 		inProgressCache.put(userId, newEvent);
 
-		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
-		if (map.get(userId) == null) {
-			map.put(userId, new HashSet<EventModel>());
-		}
+
 		Cache.getInstance().setInProgressEventCreations(inProgressCache);
 		sendMessageRequest.setText(
 				"<strong>Event Creation</strong>"
@@ -52,8 +64,7 @@ public class EventStartCommand {
 				+ System.getProperty("line.separator")
 				+ "What is the name of your event? "
 				 );
-		sendMessageRequest.setChatId(chatId);
-		sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+
 		return sendMessageRequest;
 	}
 	
@@ -88,11 +99,20 @@ public class EventStartCommand {
 //					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
 //					LocalDateTime eventDate = LocalDateTime.parse(dateInput, formatter);
 					
+					String date = message.getText();
 					String dateInput = message.getText().substring(0,10);
 					System.out.println("dateinput: " + dateInput);
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 					LocalDate eventDate = LocalDate.parse(dateInput, formatter);
-					inProgressEventItem.setEventDate(dateInput);
+					LocalDateTime currentTime = Cache.getInstance().getCurrentTime();
+					LocalDate currentDay = currentTime.toLocalDate();
+					if(eventDate.isBefore(currentDay)){
+						sendMessageRequest.setText("Date cannot be before today");
+						return sendMessageRequest;
+					}
+
+					
+					inProgressEventItem.setEventDate(date);
 					sendMessageRequest.setText("Where is the location of this event?");
 					inProgressEventItem.setEventInputStage(3);
 

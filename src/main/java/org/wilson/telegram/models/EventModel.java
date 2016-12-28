@@ -1,6 +1,7 @@
 package org.wilson.telegram.models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class EventModel {
 	private String eventLocation;
 	private String eventDate;
 	private Long channelId;
-	private HashSet<String> totalResponses;
+	private HashMap<String, Boolean> totalResponses;
 
 
 	private HashSet<String> inLineMessageIds;
@@ -31,7 +32,7 @@ public class EventModel {
 		eventHost = null;
 		eventHostFirst = null;
 		attendees = new HashSet<String>();
-		totalResponses = new HashSet<String>();
+		totalResponses = new HashMap<String, Boolean>();
 		eventInputStage = 0;
 		eventName = null;
 		eventLocation = null;
@@ -48,7 +49,7 @@ public class EventModel {
 		eventHost = null;
 		eventHostFirst = null;
 		attendees = new HashSet<String>();
-		totalResponses = new HashSet<String>();
+		totalResponses = new HashMap<String, Boolean>();
 		eventInputStage = 0;
 		eventLocation = null;
 		eventDate = null;
@@ -62,7 +63,7 @@ public class EventModel {
 		eventGrid = new ArrayList<List<InlineKeyboardButton>>();
 		eventHostFirst = null;
 		attendees = new HashSet<String>();
-		totalResponses = new HashSet<String>();
+		totalResponses = new HashMap<String, Boolean>();
 		eventInputStage = 0;
 		inLineMessageIds = new HashSet<String>();
 		channelId = null;
@@ -185,11 +186,11 @@ public class EventModel {
 
 
 		
-	public HashSet<String> getTotalResponses() {
+	public HashMap<String, Boolean> getTotalResponses() {
 		return totalResponses;
 	}
 
-	public void setTotalResponses(HashSet<String> totalResponses) {
+	public void setTotalResponses(HashMap<String, Boolean> totalResponses) {
 		this.totalResponses = totalResponses;
 	}
 

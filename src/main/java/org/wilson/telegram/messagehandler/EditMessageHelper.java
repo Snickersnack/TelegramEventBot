@@ -1,6 +1,7 @@
 package org.wilson.telegram.messagehandler;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
@@ -51,6 +52,12 @@ public class EditMessageHelper {
 					String dateInput = message.getText().substring(0,10);
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 					LocalDate eventDate = LocalDate.parse(dateInput, formatter);
+					LocalDateTime currentTime = Cache.getInstance().getCurrentTime();
+					LocalDate currentDay = currentTime.toLocalDate();
+					if(eventDate.isBefore(currentDay)){
+						sendMessageRequest.setText("Date cannot be before today");
+						return sendMessageRequest;
+					}
 					sb.append("New event date: <i>" + message.getText() +  "</i>");
 					sb.append(System.getProperty("line.separator"));
 

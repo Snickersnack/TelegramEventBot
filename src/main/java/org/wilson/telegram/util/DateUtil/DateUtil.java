@@ -1,4 +1,4 @@
-package org.wilson.telegram.util;
+package org.wilson.telegram.util.DateUtil;
 
 import java.net.InetAddress;
 import java.time.Instant;
@@ -7,6 +7,7 @@ import java.time.ZoneId;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
+import org.wilson.telegram.client.Cache;
 
 public final class DateUtil {
 	
@@ -33,7 +34,9 @@ public final class DateUtil {
 				TimeInfo timeInfo = timeClient.getTime(inetAddress);
 				returnTime = timeInfo.getMessage().getTransmitTimeStamp().getTime();
 				LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(returnTime), ZoneId.systemDefault());
+				Cache.getInstance().setCurrentTime(date);
 				completed = true;
+				
 				return date;
 			} catch (Exception e) {
 				System.out.println("Unable to get Current time: " + e);

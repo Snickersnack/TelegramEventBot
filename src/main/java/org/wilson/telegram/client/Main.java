@@ -5,7 +5,7 @@ import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.logging.BotLogger;
-import org.wilson.telegram.util.DateScheduler;
+import org.wilson.telegram.util.DateUtil.DateScheduler;
 
 /**
  * Main initialization class

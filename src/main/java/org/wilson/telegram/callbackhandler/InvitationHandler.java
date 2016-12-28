@@ -100,17 +100,19 @@ public class InvitationHandler extends UpdateHandler {
 		userFirst = callBack.getFrom().getFirstName();
 		response = callBack.getData();
 		HashSet<String> attendees = eventModel.getAttendees();
-		HashSet<String> responses = eventModel.getTotalResponses();
+		HashMap<String, Boolean> responses = eventModel.getTotalResponses();
+
+
 		String[] responseArray = response.split(" ");
 		response = responseArray[0];
 		
 		if (response.equals(EventResponse.ACCEPT)) {
 				attendees.add(userFirst);
-				System.out.println(responses.add(userFirst));
+				System.out.println(responses.put(userFirst, true));
 			 
 		} else {
 				attendees.remove(userFirst);
-				System.out.println(responses.add(userFirst));
+				System.out.println(responses.put(userFirst, false));
 
 			
 		}
