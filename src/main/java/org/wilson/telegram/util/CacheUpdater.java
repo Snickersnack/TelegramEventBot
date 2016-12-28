@@ -54,6 +54,5 @@ public final class CacheUpdater {
 		channelSet.add(newEvent);
 		// is it already in channelMap?
 		// if not find and add to channelMap from userMap (linking events)
-		System.out.println("event added: " + eventName);
 	}
 }

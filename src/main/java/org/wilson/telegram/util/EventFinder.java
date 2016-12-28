@@ -42,81 +42,14 @@ public class EventFinder {
 						return newEvent;
 					}
 				}
+			}else{
+				System.out.println("couldnt find event??");
+				System.out.println("event id: " + newEvent.getEventId());
 			}
 		}
 		return null;
 	}
-	
-	public static SendMessage listAllEvents(Integer userId, SendMessage sendMessageRequest, String type){
-		HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
 
-		HashSet<EventModel> eventSet = userMap.get(userId);
-
-		Integer eventNumber = eventSet.size();
-		if(eventNumber == 0){
-			sendMessageRequest.setText("You have no events");
-			return sendMessageRequest;
-		}
-		System.out.println("total events for user: " + eventNumber);
-		KeyboardBuilder keyboardBuilder = new KeyboardBuilder(eventNumber, 1);
-		for(EventModel event : eventSet){
-			InlineKeyboardButton button = new InlineKeyboardButton();
-			button.setText(event.getEventName());
-			button.setCallbackData(type + " " + event.getEventId());					
-			keyboardBuilder.addButton(button);
-
-		}
-		InlineKeyboardMarkup markup = keyboardBuilder.buildMarkup();
-		sendMessageRequest.setReplyMarkup(markup);
-		if(type.equals(EventEdit.EDITTYPE)){
-			sendMessageRequest.setText("<strong>" + EventEdit.EDITTITLE + "</strong>"
-					+ System.getProperty("line.separator")
-					+ System.getProperty("line.separator"));
-		}else if(type.equals(EventDelete.DELETETYPE)){
-			sendMessageRequest.setText("<strong>" + EventDelete.DELETETITLE + "</strong>"
-					+ System.getProperty("line.separator")
-					+ System.getProperty("line.separator"));
-		}
-
-		return sendMessageRequest;
-			
-
-	}
-	
-	public static EditMessageText listAllEvents(Integer userId, EditMessageText editRequest, String type){
-		HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
-
-		HashSet<EventModel> eventSet = userMap.get(userId);
-
-		Integer eventNumber = eventSet.size();
-		if(eventNumber == 0){
-			editRequest.setText("You have no events");
-			return editRequest;
-		}
-		System.out.println("total events for user: " + eventNumber);
-		KeyboardBuilder keyboardBuilder = new KeyboardBuilder(eventNumber, 1);
-		for(EventModel event : eventSet){
-			InlineKeyboardButton button = new InlineKeyboardButton();
-			button.setText(event.getEventName());
-			button.setCallbackData(type + " " + event.getEventId());					
-			keyboardBuilder.addButton(button);
-
-		}
-		InlineKeyboardMarkup markup = keyboardBuilder.buildMarkup();
-		editRequest.setReplyMarkup(markup);
-		if(type.equals(EventEdit.EDITTYPE)){
-			editRequest.setText("<strong>" + EventEdit.EDITTITLE + "</strong>"
-					+ System.getProperty("line.separator")
-					+ System.getProperty("line.separator"));
-		}else if(type.equals(EventDelete.DELETETYPE)){
-			editRequest.setText("<strong>" + EventDelete.DELETETITLE + "</strong>"
-					+ System.getProperty("line.separator")
-					+ System.getProperty("line.separator"));
-		}
-		return editRequest;
-			
-
-	}
 	
 	
 	public static boolean deleteEvent(EventModel event){
@@ -151,6 +84,20 @@ public class EventFinder {
 		}
 		return null;
 	}
+	
+	public static EventModel findEventbyNameUser(String eventName, Integer userId){
+		HashSet<EventModel> userSet = Cache.getInstance().getMasterEventMap().get(userId);
+			
+			for(EventModel userEvent : userSet){
+				if(userEvent.getEventName().equals(eventName)){
+					return userEvent;
+				}
+			}
+		
+		return null;
+	}
+	
+	
 	public static EventModel findEventByInlineMessageId(String inLineMessageId) {
 		HashMap<Integer, HashSet<EventModel>>map = Cache.getInstance().getMasterEventMap();
 		EventModel eventModel = new EventModel();

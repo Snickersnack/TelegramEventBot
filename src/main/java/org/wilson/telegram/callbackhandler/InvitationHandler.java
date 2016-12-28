@@ -14,6 +14,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.client.UpdateHandler;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.templates.EventResponse;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
 
@@ -103,14 +104,12 @@ public class InvitationHandler extends UpdateHandler {
 		String[] responseArray = response.split(" ");
 		response = responseArray[0];
 		
-		if (response.equals("Yes")) {
+		if (response.equals(EventResponse.ACCEPT)) {
 				attendees.add(userFirst);
-				System.out.println("adding response on a yes: ");
 				System.out.println(responses.add(userFirst));
 			 
 		} else {
 				attendees.remove(userFirst);
-				System.out.println("adding response on a no: ");
 				System.out.println(responses.add(userFirst));
 
 			

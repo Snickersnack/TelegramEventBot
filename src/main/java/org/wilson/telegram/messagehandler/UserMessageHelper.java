@@ -2,24 +2,25 @@ package org.wilson.telegram.messagehandler;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.commandprocesses.EventStartCommand;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.templates.Commands;
+import org.wilson.telegram.templates.EventClear;
 import org.wilson.telegram.templates.EventDelete;
 import org.wilson.telegram.templates.EventEdit;
-import org.wilson.telegram.util.EventFinder;
+import org.wilson.telegram.templates.EventMenu;
+import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.KeyboardBuilder;
+import org.wilson.telegram.util.RespondeesCommand;
 
 public class UserMessageHelper extends MessageParser{
 
@@ -34,29 +35,12 @@ public class UserMessageHelper extends MessageParser{
 	public BotApiMethod<?> parse(Message message) {
 		
 		command = message.getText();
-		userId = message.getFrom().getId();
+		User user = message.getFrom();
+		userId = user.getId();
+		Long chatId = message.getChatId();
 
 		if (command.startsWith(Commands.STARTCOMMAND)) {
-			EventModel newEvent = new EventModel();
-			newEvent.setEventHostFirst(message.getFrom().getFirstName());
-			newEvent.setEventInputStage(1);
-
-			inProgressCache.put(userId, newEvent);
-
-			HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
-			if (map.get(userId) == null) {
-				map.put(userId, new HashSet<EventModel>());
-			}
-			Cache.getInstance().setInProgressEventCreations(inProgressCache);
-			sendMessageRequest.setText(
-					"<strong>Event Creation</strong>"
-					+ System.getProperty("line.separator")
-					+ "Use /start to start from the beginning. Use /cancel to exit"
-					+ System.getProperty("line.separator")
-					+ System.getProperty("line.separator")
-					+ System.getProperty("line.separator")
-					+ "What is the name of your event? "
-					 );
+			return EventStartCommand.start(user, chatId);
 		}
 
 		else if (inProgressCache.get(userId) != null) {
@@ -78,62 +62,57 @@ public class UserMessageHelper extends MessageParser{
 			}
 		}
 		
-		else if(command.startsWith(Commands.RESPONDEESCOMMAND)){
-			HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
-			EventModel event;
-			HashSet<EventModel> userEvents = userMap.get(userId);
-			if (userEvents != null && userEvents.size() != 0) {
-				for (EventModel channelEvent : userEvents) {
-					event = channelEvent;
-					StringBuilder sb = new StringBuilder();
-					sb.append("<strong>" + event.getEventName() + "</strong>");
-					sb.append(System.getProperty("line.separator"));
-					sb.append("Persons responded: ");
-					int count = 1;
-					for(String person : event.getTotalResponses()){
-						if(count == event.getTotalResponses().size()){
-							sb.append(person);
-						}else{
-							sb.append(person);
-							sb.append(",");
-							count++;
-						}
+		else if(command.startsWith(Commands.MENUCOMMAND)){
+			KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
+			InlineKeyboardMarkup markup = keyboardBuilder.buildMenu();
+			sendMessageRequest.setReplyMarkup(markup);
+			StringBuilder sb = new StringBuilder();
+			sb.append(EventMenu.MENUTITLE);
+			sb.append(System.getProperty("line.separator"));
+			sb.append(System.getProperty("line.separator"));
+			sb.append("<i>Select an action below</i>");
+			sb.append(System.getProperty("line.separator"));
+			sendMessageRequest.setText(sb.toString());
 
-					
-					sendMessageRequest.setText(sb.toString());
-					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
-					try {
-						sendMessage(sendMessageRequest);
-					} catch (TelegramApiException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					}
-				}
-			}
+
+		}
+		
+		else if(command.startsWith(Commands.RESPONDEESCOMMAND)){
+			RespondeesCommand respond = new RespondeesCommand();
+			respond.build(userId, chatId, false);
 			return null;
 		}
 		//Provides a bunch of buttons. Actual edit is handled in the callback handler
 		else if (command.startsWith(Commands.EDITCOMMAND)) {
 			HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
 			HashSet<EventModel> eventSet = userMap.get(userId);
+			StringBuilder sb = new StringBuilder();
+			sb.append(EventEdit.EDITTITLE);
+			sb.append(System.getProperty("line.separator"));
+
 			if(eventSet != null && eventSet.size() > 0){
-				sendMessageRequest = EventFinder.listAllEvents(userId, sendMessageRequest, EventEdit.EDITTYPE);			
+				sendMessageRequest = EventBuilder.listAllEvents(userId, sendMessageRequest, EventEdit.EDITTYPE, sb);			
 			}else{
 				sendMessageRequest.setText("<i>You currently have no events</i>");
 			}
 			
+			sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+
 			return sendMessageRequest;
 
 		}
 		else if (command.startsWith(Commands.DELETEEVENTSCOMMAND)) {
 				HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
 				HashSet<EventModel> eventSet = userMap.get(userId);
+				StringBuilder sb = new StringBuilder();
+				sb.append(EventDelete.DELETETITLE);
+				sb.append(System.getProperty("line.separator"));
 				if(eventSet != null && eventSet.size() > 0){
-					sendMessageRequest = EventFinder.listAllEvents(userId, sendMessageRequest, EventDelete.DELETETYPE);	
+					sendMessageRequest = EventBuilder.listAllEvents(userId, sendMessageRequest, EventDelete.DELETETYPE, sb);	
 				}else{
 					sendMessageRequest.setText("<i>You currently have no events</i>");
 				}
+				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 				
 				return sendMessageRequest;
 			
@@ -141,14 +120,31 @@ public class UserMessageHelper extends MessageParser{
 			
 			
 		} else if (command.startsWith(Commands.CLEAREVENTSCOMMAND)) {
-			Cache.getInstance().clearUserEvents(userId);
-			sendMessageRequest.setText("<i>Your events have been cleared</i>");
+			
+			sendMessageRequest.setText("Are you sure you want to remove all your events?");
+			sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+			KeyboardBuilder kb = new KeyboardBuilder(1,2);
+			InlineKeyboardButton acceptButton = new InlineKeyboardButton();
+			InlineKeyboardButton declineButton = new InlineKeyboardButton();
+			acceptButton.setText(EventClear.ACCEPT);
+			acceptButton.setCallbackData(EventClear.TYPE + " " + EventClear.ACCEPT);
+			declineButton.setText(EventClear.DECLINE);
+			declineButton.setCallbackData(EventClear.TYPE + " " + EventClear.DECLINE);
+			kb.addButton(acceptButton);
+			kb.addButton(declineButton);
+			InlineKeyboardMarkup  markup = kb.buildMarkup();
+			sendMessageRequest.setReplyMarkup(markup);
+			
+			
+
 
 		}
 		
 		else if(Cache.getInstance().getInProgressEdit().get(message.getFrom().getId())!=null){
 			BotApiMethod<?> sendRequest = EditMessageHelper.parse(message);
 			SendMessage test = (SendMessage) sendRequest;
+			System.out.println(test.getText());
+			
 			return sendRequest;
 			
 		}else{

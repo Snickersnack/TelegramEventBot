@@ -32,7 +32,7 @@ public class EditMessageHelper {
 		EventModel event = editModel.getEventModel();
 		//possibly do another fine event here?
 		StringBuilder sb = new StringBuilder();
-		sb.append("<strong>" + EventEdit.EDITTITLE + "</strong>");
+		sb.append(EventEdit.EDITTITLE );
 		sb.append(System.getProperty("line.separator"));
 		sb.append(System.getProperty("line.separator"));
 

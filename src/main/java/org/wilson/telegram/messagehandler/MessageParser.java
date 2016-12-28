@@ -48,8 +48,7 @@ public class MessageParser extends UpdateHandler {
 		
 		if (command.startsWith(Commands.HELPCOMMAND)
 				&& command.substring(0, 5).equals("/help")) {
-//			String helpText = ""
-			
+			sendMessageRequest.setText(Commands.HELPTEXT);
 		}
 		else if(message.isUserMessage()){
 			if(command.startsWith(Commands.VIEWCOMMAND)){
@@ -80,7 +79,8 @@ public class MessageParser extends UpdateHandler {
 			
 			else if(command.startsWith(Commands.DELETEEVENTSCOMMAND) 
 					|| command.startsWith(Commands.CLEAREVENTSCOMMAND) || command.startsWith(Commands.EDITCOMMAND) 
-					|| command.startsWith(Commands.CANCELCOMMAND)){
+					|| command.startsWith(Commands.CANCELCOMMAND) || command.startsWith(Commands.MENUCOMMAND)
+					|| command.startsWith(Commands.RESPONDEESCOMMAND)){
 				
 				sendMessageRequest.setText("Message @EvePlannerBot directly to use this command");
 

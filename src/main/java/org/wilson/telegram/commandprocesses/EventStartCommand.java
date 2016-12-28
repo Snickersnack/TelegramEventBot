@@ -2,18 +2,20 @@ package org.wilson.telegram.commandprocesses;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.templates.EventResponse;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
 import org.wilson.telegram.util.KeyboardBuilder;
@@ -24,6 +26,38 @@ public class EventStartCommand {
 	public EventStartCommand(){
 		
 	}
+	
+	public static SendMessage start(User user, Long chatId){
+		SendMessage sendMessageRequest = new SendMessage();
+		EventModel newEvent = new EventModel();
+		Integer userId = user.getId();
+		newEvent.setEventHostFirst(user.getFirstName());
+		newEvent.setEventInputStage(1);
+
+		HashMap<Integer, EventModel> inProgressCache = Cache.getInstance().getInProgressEventCreations();
+
+		inProgressCache.put(userId, newEvent);
+
+		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
+		if (map.get(userId) == null) {
+			map.put(userId, new HashSet<EventModel>());
+		}
+		Cache.getInstance().setInProgressEventCreations(inProgressCache);
+		sendMessageRequest.setText(
+				"<strong>Event Creation</strong>"
+				+ System.getProperty("line.separator")
+				+ "Use /start to start from the beginning. Use /cancel to exit"
+				+ System.getProperty("line.separator")
+				+ System.getProperty("line.separator")
+				+ System.getProperty("line.separator")
+				+ "What is the name of your event? "
+				 );
+		sendMessageRequest.setChatId(chatId);
+		sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+		return sendMessageRequest;
+	}
+	
+	
 	
 	public static SendMessage setEventInfo(Message message){
 		//maybe add protection against same user creating event at the same tiem?
@@ -40,9 +74,9 @@ public class EventStartCommand {
 				inProgressEventItem.setEventName(message.getText());
 
 				//If event already exists, request another input
-				EventModel temp = EventFinder.findEventbyName(inProgressEventItem.getEventName());
+				EventModel temp = EventFinder.findEventbyNameUser(inProgressEventItem.getEventName(), userId);
 				if(temp != null){
-					sendMessageRequest.setText("There is already an event with this name. Please try another name");
+					sendMessageRequest.setText("You already have an event with this name. Please try another name");
 				}else{
 					sendMessageRequest.setText("What is the date of this event? (e.g. 11/21/2017 10:00PM)");
 					inProgressEventItem.setEventInputStage(2);
@@ -120,10 +154,10 @@ public class EventStartCommand {
 		KeyboardBuilder eventKeyBoard = new KeyboardBuilder(1,2);
 		InlineKeyboardButton button = new InlineKeyboardButton();
 		InlineKeyboardButton button2 = new InlineKeyboardButton();
-		button.setText("Yes");
-		button.setCallbackData("Yes");
-		button2.setText("No");
-		button2.setCallbackData("No");
+		button.setText(EventResponse.ACCEPT);
+		button.setCallbackData(EventResponse.ACCEPT);
+		button2.setText(EventResponse.DECLINE);
+		button2.setCallbackData(EventResponse.DECLINE);
 		eventKeyBoard.addButton(button);
 		eventKeyBoard.addButton(button2);
 		List<List<InlineKeyboardButton>> newKeyboard = eventKeyBoard.buildKeyboard();

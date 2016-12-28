@@ -6,5 +6,5 @@ public class EventDelete {
 	public static final String DECLINE  = "No";
 	public static final String DELETETYPE = "delete";
 	public static final String DELETELIST = "deletelist";
-	public static final String DELETETITLE = "Delete Events";
+	public static final String DELETETITLE = "<strong>Delete Events</strong>";
 }

@@ -79,28 +79,6 @@ public class Cache {
 		return event;
 	}
 	
-	public void listAllEvents(Long id){
-		EventModel test = new EventModel(id);
-
-		for(Entry<Integer, HashSet<EventModel>> item : masterEventMap.entrySet()){
-			if(item.getValue().contains(test)){
-				System.out.println("ITS EVEN IN THE SET");
-			}else{
-				System.out.println("how is it not in the set");
-			}
-			for(EventModel event : item.getValue()){
-				System.out.println("listing all events :" + event.getEventName());
-				
-				if(event.equals(test)){
-					System.out.println("foudn it here");
-				}
-				
-				else{
-					System.out.println("nooope");
-				}
-			}
-		}
-	}
 	public Boolean addEventMapEvent(Integer userId, EventModel event){
 		if(!masterEventMap.containsKey(userId)){
 			HashSet<EventModel> newSet = new HashSet<EventModel>();

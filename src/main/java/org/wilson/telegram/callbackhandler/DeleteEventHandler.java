@@ -1,21 +1,17 @@
 package org.wilson.telegram.callbackhandler;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
-import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.client.UpdateHandler;
-import org.wilson.telegram.models.EditModel;
 import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.templates.EventDelete;
-import org.wilson.telegram.templates.EventEdit;
+import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
 import org.wilson.telegram.util.KeyboardBuilder;
 
@@ -34,7 +30,7 @@ public class DeleteEventHandler extends UpdateHandler{
 		
 		EditMessageText editRequest = new EditMessageText();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<strong>" + EventDelete.DELETETITLE + "</strong>");
+		sb.append(EventDelete.DELETETITLE);
 		sb.append(System.getProperty("line.separator"));
 		sb.append(System.getProperty("line.separator"));
 		Long chatId = callBack.getMessage().getChatId();
@@ -47,6 +43,8 @@ public class DeleteEventHandler extends UpdateHandler{
 		Integer userId = callBack.getFrom().getId();
 		
 		
+		
+		//If we've already processed all steps:
 		if(dataArray.length >2){
 			
 			EventModel event = new EventModel(Long.parseLong(dataArray[1]));
@@ -80,7 +78,7 @@ public class DeleteEventHandler extends UpdateHandler{
 				break;
 
 			case EventDelete.DECLINE:
-				editRequest = EventFinder.listAllEvents(userId, editRequest, EventDelete.DELETETYPE);
+				editRequest = EventBuilder.listAllEvents(userId, editRequest, EventDelete.DELETETYPE, sb);
 				editRequest.setParseMode("HTML");
 				return editRequest;
 				}	
@@ -89,14 +87,31 @@ public class DeleteEventHandler extends UpdateHandler{
 			
 		}
 		
+		//Listing all events
 		else if(dataArray[1].equals(EventDelete.DELETELIST)){
-			editRequest = EventFinder.listAllEvents(userId, editRequest, EventDelete.DELETETYPE);	
-			editRequest.setParseMode("HTML");
-			return editRequest;
+			HashSet<EventModel> events = Cache.getInstance().getMasterEventMap().get(userId);
+			if(events == null || events.size() == 0){
+				sb.append("<i>You have no events</i>");
+				KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
+				markup = keyboardBuilder.buildReturnMenu();
+			}else{
+				editRequest = EventBuilder.listAllEvents(userId, editRequest, EventDelete.DELETETYPE, sb);	
+				editRequest.setParseMode("HTML");
+				return editRequest;
+			}
+
 		}
+		
+		//Else send a confirmation deletion
 		else{
 			EventModel event = new EventModel(Long.parseLong(dataArray[1]));
 			event = EventFinder.findEvent(event, Cache.getInstance().getMasterEventMap());
+			if(event == null){
+				sb.append("This event has already been deleted");
+				editRequest.setText(sb.toString());
+				editRequest.setParseMode("HTML");
+				return editRequest;
+			}
 			sb.append("Confirm deletion of <i>" + event.getEventName() + "</i>");
 			KeyboardBuilder keyboardBuilder = new KeyboardBuilder(1,2);
 			

@@ -30,7 +30,7 @@ public class EditEventHandler {
 	public EditMessageText handleCallbackQuery() {
 		EditMessageText editRequest = new EditMessageText();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<strong>" + EventEdit.EDITTITLE + "</strong>");
+		sb.append(EventEdit.EDITTITLE );
 		sb.append(System.getProperty("line.separator"));
 		sb.append(System.getProperty("line.separator"));
 		Long chatId = callBack.getMessage().getChatId();
@@ -51,7 +51,6 @@ public class EditEventHandler {
 			EventModel event = new EventModel(Long.parseLong(dataArray[1]));
 			System.out.println("dataArray 1: " + dataArray[1]);
 			eventModel = EventFinder.findEvent(event, Cache.getInstance().getMasterEventMap());
-			Cache.getInstance().listAllEvents(Long.parseLong(dataArray[1]));
 			EditModel editModel = new EditModel(messageId, chatId);
 			editModel.setEventModel(eventModel);
 			String eventType = dataArray[2];
@@ -91,46 +90,30 @@ public class EditEventHandler {
 
 			
 		}
+		
+		//build current events
 		else if(dataArray[1].equals(EventEdit.EVENTLIST)){
-			HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
-			HashSet<EventModel> eventSet = userMap.get(userId);
-			if(eventSet != null && eventSet.size() > 0){
-				Integer eventNumber = eventSet.size();
-				System.out.println("total events for user: " + eventNumber);
-				KeyboardBuilder keyboardBuilder = new KeyboardBuilder(eventNumber, 1);
-				for(EventModel event : eventSet){
-					InlineKeyboardButton button = new InlineKeyboardButton();
-					button.setText(event.getEventName());
-					button.setCallbackData(EventEdit.EDITTYPE + " " + event.getEventId());					
-					keyboardBuilder.addButton(button);
-				}
-			markup = keyboardBuilder.buildMarkup();
-
+			
+			HashSet<EventModel> events = Cache.getInstance().getMasterEventMap().get(userId);
+			if(events == null || events.size() == 0){
+				sb.append("<i>You have no events</i>");
+				KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
+				markup = keyboardBuilder.buildReturnMenu();
+			}else{
+				KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
+				markup = keyboardBuilder.buildEventsList(userId, EventEdit.EDITTYPE);
+				sb = new StringBuilder();
+				sb.append(EventEdit.EDITTITLE);
+				sb.append(System.getProperty("line.separator"));
 			}
-			sb = new StringBuilder();
-			sb.append("<strong>" + EventEdit.EDITTITLE + "</strong>");
-			sb.append(System.getProperty("line.separator"));
+
 
 		}
+		
+		//build edit Menu
 		else{
-			KeyboardBuilder keyboardBuilder = new KeyboardBuilder(4,1);
-			int counter = 0;
-			for(String editField : EventEdit.EDITFIELDLIST){
-				InlineKeyboardButton button = new InlineKeyboardButton();
-				button.setText(EventEdit.EDITBUTTONLIST[counter]);
-				counter++;
-				StringBuilder buttonString = new StringBuilder();
-				buttonString.append(data);
-				buttonString.append(" ");
-				buttonString.append(editField);
-				button.setCallbackData(buttonString.toString());
-				keyboardBuilder.addButton(button);
-			}
-			InlineKeyboardButton button = new InlineKeyboardButton();
-			button.setText("<< Back to List");
-			button.setCallbackData(EventEdit.EDITTYPE + " " + EventEdit.EVENTLIST);
-			keyboardBuilder.addButton(button);
-			markup = keyboardBuilder.buildMarkup();
+			KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
+			markup = keyboardBuilder.buildEditMenu(data);
 	    }
 		sb.append(System.getProperty("line.separator"));
 		editRequest.setReplyMarkup(markup);
