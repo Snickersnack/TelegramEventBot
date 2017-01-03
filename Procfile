@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp target/classes:target/dependency/* classes.org.wilson.telegram.client.Main
+web: java -cp target/classes:target/dependency/* classes.org.wilson.telegram.client.Main
