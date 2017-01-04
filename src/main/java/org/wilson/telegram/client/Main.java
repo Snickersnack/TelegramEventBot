@@ -1,5 +1,8 @@
 package org.wilson.telegram.client;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -15,6 +18,15 @@ import org.wilson.telegram.util.DateUtil.DateScheduler;
 public class Main {
 
     public static void main(String[] args) throws TelegramApiRequestException {
+    	
+        ClassLoader cl = ClassLoader.getSystemClassLoader();
+
+        URL[] urls = ((URLClassLoader)cl).getURLs();
+
+        for(URL url: urls){
+        	System.out.println(url.getFile());
+        }
+        
     	ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
 

@@ -1,1 +1,1 @@
-web:    java -cp target/dependency/*:classes/org/wilson/telegram/client Main
+web: java $JAVA_OPTS -Dserver.port=$PORT -jar target/TelegramEventBot.jar  $JAR_OPTS
