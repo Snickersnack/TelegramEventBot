@@ -9,10 +9,12 @@ import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.templates.EventClear;
 import org.wilson.telegram.templates.EventDelete;
 import org.wilson.telegram.templates.EventEdit;
 import org.wilson.telegram.templates.EventMenu;
 import org.wilson.telegram.templates.EventRespondees;
+import org.wilson.telegram.templates.EventResponse;
 
 public class KeyboardBuilder {
 
@@ -32,6 +34,36 @@ public class KeyboardBuilder {
 		this.buttons = new ArrayList<InlineKeyboardButton>();
 	}
 	
+	
+	
+	public List<List<InlineKeyboardButton>> buildEventButtons(){		
+		rows = 1;
+		columns = 2;
+		InlineKeyboardButton button = new InlineKeyboardButton();
+		InlineKeyboardButton button2 = new InlineKeyboardButton();
+		button.setText(EventResponse.ACCEPT);
+		button.setCallbackData(EventResponse.ACCEPT);
+		button2.setText(EventResponse.DECLINE);
+		button2.setCallbackData(EventResponse.DECLINE);
+		buttons.add(button);
+		buttons.add(button2);
+		return buildKeyboard();
+	
+	}
+	 
+	public InlineKeyboardMarkup buildClearConfirmation(){
+		rows = 1;
+		columns = 2;
+		InlineKeyboardButton acceptButton = new InlineKeyboardButton();
+		InlineKeyboardButton declineButton = new InlineKeyboardButton();
+		acceptButton.setText(EventClear.ACCEPT);
+		acceptButton.setCallbackData(EventClear.TYPE + " " + EventClear.ACCEPT);
+		declineButton.setText(EventClear.DECLINE);
+		declineButton.setCallbackData(EventClear.TYPE + " " + EventClear.DECLINE);
+		addButton(acceptButton);
+		addButton(declineButton);
+		return buildMarkup();
+	}
 	
 	public InlineKeyboardMarkup buildEventsList(Integer userId, String type){
 		HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
@@ -88,6 +120,8 @@ public class KeyboardBuilder {
 		addButton(menuButton);
 		return buildMarkup();
 	}
+	
+	
 	public InlineKeyboardMarkup buildMenu(){
 		ArrayList<List<InlineKeyboardButton>> keyboard = new ArrayList<List<InlineKeyboardButton>>();
 		List<InlineKeyboardButton> firstRow = new ArrayList<InlineKeyboardButton>();

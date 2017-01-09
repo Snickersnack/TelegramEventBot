@@ -66,7 +66,7 @@ public class MessageParser extends UpdateHandler {
 
 			if(command.startsWith(Commands.STARTCOMMAND) ){
 				
-				sendMessageRequest.setText("Message @" + BotConfig.USERNAMENEWBOT + "directly to use this command or click below");
+				sendMessageRequest.setText("Message @" + BotConfig.USERNAMENEWBOT + " directly to use this command or click below");
 				KeyboardBuilder keyboard = new KeyboardBuilder(1,1);
 				InlineKeyboardButton button = new InlineKeyboardButton();
 				button.setText("Create events here");
@@ -82,7 +82,7 @@ public class MessageParser extends UpdateHandler {
 					|| command.startsWith(Commands.CANCELCOMMAND) || command.startsWith(Commands.MENUCOMMAND)
 					|| command.startsWith(Commands.RESPONDEESCOMMAND)){
 				
-				sendMessageRequest.setText("Message @" + BotConfig.USERNAMENEWBOT + "directly to use this command or click below");
+				sendMessageRequest.setText("Message @" + BotConfig.USERNAMENEWBOT + " directly to use this command or click below");
 
 			}
 			else{

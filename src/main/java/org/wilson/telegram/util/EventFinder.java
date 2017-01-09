@@ -109,7 +109,6 @@ public class EventFinder {
 						return eventModel;
 					}
 				}
-
 			}
 		}
 		return null;

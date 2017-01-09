@@ -6,8 +6,6 @@ public final class EventEdit {
 	//EDIT *Event Name* EDITTYPE
 	
 	//Changing EDITTYPE will affect Callback handling
-	public static final String ACCEPT  = "Yes";
-	public static final String DECLINE  = "No";
 	public static final String EDITTYPE = "Edit";
 	public static final String EDITNAME = "EditTitle";
 	public static final String EDITDATE = "EditDate";

@@ -38,6 +38,9 @@ public class DateScheduler implements Runnable {
 		}catch(Exception e){
 			System.out.println(e);
 		}
+		
+		
+		
 	}
 
 }

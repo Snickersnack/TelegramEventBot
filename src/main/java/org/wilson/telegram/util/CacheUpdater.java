@@ -2,11 +2,16 @@ package org.wilson.telegram.util;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
+import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.models.EventModel;
+
+import persistence.HibernateUtil;
 
 public final class CacheUpdater {
 
@@ -21,12 +26,30 @@ public final class CacheUpdater {
 		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
 		EventModel tempEvent = new EventModel(Long.parseLong(resultId));
 		EventModel foundEvent = EventFinder.findEvent(tempEvent, map);
-//		Cache.getInstance().listAllEvents(Long.parseLong(resultId));
 		
 		//search based on the ResultId
-		HashSet<String> set = foundEvent.getInLineMessageId();
+		Set<String> set = foundEvent.getInLineMessageId();
 		set.add(inLineMessageId);
 
+		Session session = null;
+		try{
+			session =  HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction(); 
+			session.saveOrUpdate(foundEvent); 
+			session.getTransaction().commit();
+
+		}catch(ConstraintViolationException e){
+			System.out.println("did not consume: " + foundEvent.getEventName());
+			session.getTransaction().rollback();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			if (session != null){
+			session.close();
+			}
+		}
 		
 	}
 	
@@ -50,7 +73,6 @@ public final class CacheUpdater {
 		
 		
 		newEvent = EventFinder.findEventbyName(eventName);
-		newEvent.setChannelId(channelId);
 		channelSet.add(newEvent);
 		// is it already in channelMap?
 		// if not find and add to channelMap from userMap (linking events)

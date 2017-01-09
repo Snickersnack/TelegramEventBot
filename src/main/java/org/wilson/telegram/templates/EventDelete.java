@@ -7,4 +7,6 @@ public class EventDelete {
 	public static final String DELETETYPE = "delete";
 	public static final String DELETELIST = "deletelist";
 	public static final String DELETETITLE = "<strong>Delete Events</strong>";
+	
+	
 }

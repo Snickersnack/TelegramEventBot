@@ -8,6 +8,7 @@ import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.Cache;
+import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.templates.Commands;
 import org.wilson.telegram.util.CacheUpdater;
@@ -59,7 +60,7 @@ public class GroupMessageHelper extends MessageParser{
 					markup.setKeyboard(event.getEventGrid());
 					sendMessageRequest.setReplyMarkup(markup);
 					sendMessageRequest.setText(event.getEventText());
-					sendMessageRequest.setParseMode("HTML");
+					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 					try {
 						sendMessage(sendMessageRequest);
 					} catch (TelegramApiException e) {

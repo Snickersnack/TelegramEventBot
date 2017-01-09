@@ -49,12 +49,12 @@ public class UserMessageHelper extends MessageParser{
 				inProgressCache.put(userId, null);
 				KeyboardBuilder keyboardBuilder = new KeyboardBuilder(1,1);
 				InlineKeyboardButton button = new InlineKeyboardButton();
-				button.setText("Cancelled");
+				button.setText("Return to a channel");
 				button.setSwitchInlineQuery(" ");
 				keyboardBuilder.addButton(button);
 				InlineKeyboardMarkup markup = keyboardBuilder.buildMarkup();
 				sendMessageRequest.setReplyMarkup(markup);
-				sendMessageRequest.setText("Event Cancelled!");
+				sendMessageRequest.setText("Return to the /menu");
 				return sendMessageRequest;
 			}else{
 				sendMessageRequest = EventStartCommand.setEventInfo(message);
@@ -79,9 +79,10 @@ public class UserMessageHelper extends MessageParser{
 		
 		else if(command.startsWith(Commands.RESPONDEESCOMMAND)){
 			RespondeesCommand respond = new RespondeesCommand();
-			respond.build(userId, chatId, false);
+			respond.buildSend(userId, chatId);
 			return null;
 		}
+		
 		//Provides a bunch of buttons. Actual edit is handled in the callback handler
 		else if (command.startsWith(Commands.EDITCOMMAND)) {
 			HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
@@ -148,9 +149,9 @@ public class UserMessageHelper extends MessageParser{
 			return sendRequest;
 			
 		}else{
-			//return null when there's nothing to update...seems like code smell
 			return null;
 		}
+		
 		return sendMessageRequest;
 	}
 }

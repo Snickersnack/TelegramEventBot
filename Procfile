@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -Dserver.port=$PORT -jar target/TelegramEventBot.jar  $JAR_OPTS
+worker: java $JAVA_OPTS -jar target/TelegramEventBot.jar  $JAR_OPTS

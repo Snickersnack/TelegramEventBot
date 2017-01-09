@@ -19,6 +19,7 @@ public class Cache {
 	private HashMap<Integer, EventModel> inProgressEventCreations;
 	private HashMap<Integer, EditModel> inProgressEdit;
 	private HashMap<Long, HashSet<EventModel>> channelEventMap;
+	private HashSet<Long> persistenceQueue;
 	private Long globalEventId;
 	private LocalDateTime currentTime;
 
@@ -30,6 +31,7 @@ public class Cache {
 		setChannelEventMap(new HashMap<Long, HashSet<EventModel>>() );
 		setInProgressEventCreations(new HashMap<Integer, EventModel>());
 		setInProgressEdit(new HashMap<Integer, EditModel>());
+		setPersistenceQueue(new HashSet<Long>());
 		globalEventId = 1L; //resultId CANNOT be 0
 		currentTime = null;
 	}
@@ -39,10 +41,21 @@ public class Cache {
 	}
 
 	
+	public void init(){
+		
+	}
 
 
 	public HashMap<Integer, HashSet<EventModel>> getMasterEventMap() {
 		return masterEventMap;
+	}
+
+	public HashSet<Long> getPersistenceQueue() {
+		return persistenceQueue;
+	}
+
+	public void setPersistenceQueue(HashSet<Long> persistenceQueue) {
+		this.persistenceQueue = persistenceQueue;
 	}
 
 	public void setMasterEventMap(HashMap<Integer, HashSet<EventModel>> eventMap) {

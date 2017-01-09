@@ -88,7 +88,7 @@ public class EventBuilder {
 		String eventHostFirst = eventModel.getEventHostFirst();
 		HashSet<String> attendees = eventModel.getAttendees();
 		Integer newAttendee = attendees.size();
-		String attendeeList = "Attendees (" + newAttendee + "): ";
+		String attendeeList = "👥  (" + newAttendee + "): ";
 		int counter = 1;
 		if (!attendees.isEmpty()) {
 			for (String item : attendees) {
@@ -106,7 +106,7 @@ public class EventBuilder {
 		
 		eventText = "<strong>" + eventName + "</strong>"
 				+ System.getProperty("line.separator") + eventDate
-				+ System.getProperty("line.separator") + "📍" + eventLocation
+				+ System.getProperty("line.separator") + eventLocation
 				+ System.getProperty("line.separator") + attendeeList;
 		
 		return eventText;

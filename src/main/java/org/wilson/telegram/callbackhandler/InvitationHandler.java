@@ -2,7 +2,10 @@ package org.wilson.telegram.callbackhandler;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
+import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 import org.telegram.telegrambots.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
@@ -17,6 +20,8 @@ import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.templates.EventResponse;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
+
+import persistence.HibernateUtil;
 
 public class InvitationHandler extends UpdateHandler {
 
@@ -37,7 +42,6 @@ public class InvitationHandler extends UpdateHandler {
 		cachedUser = null;
 		eventModel = null;
 		callBack = update.getCallbackQuery();
-
 	}
 
 
@@ -53,10 +57,11 @@ public class InvitationHandler extends UpdateHandler {
 			
 			//we are editing an event sent from /view
 			String eventName = callBack.getMessage().getText().split("\\r?\\n")[0];
-			eventModel = EventFinder.findEventbyName(eventName);
 			
+			eventModel = EventFinder.findEventbyName(eventName);
+			Long chatId = callBack.getMessage().getChatId();
 			editRequest.setMessageId(callBack.getMessage().getMessageId());
-			editRequest.setChatId(eventModel.getChannelId());
+			editRequest.setChatId(chatId);
 		}
 		
 		//This isn't a event message or we don't have such an event
@@ -80,6 +85,26 @@ public class InvitationHandler extends UpdateHandler {
 		editRequest.setText(eventText);
 		editRequest.setReplyMarkup(markup);
 		
+		Session session = null;
+		try{
+			session =  HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction(); 
+			session.saveOrUpdate(eventModel); 
+			session.getTransaction().commit();
+
+		}catch(ConstraintViolationException e){
+			System.out.println("did not consume: " + eventModel.getEventName());
+			session.getTransaction().rollback();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			if (session != null){
+			session.close();
+			}
+		}
+//		Cache.getInstance().getPersistenceQueue().add(eventModel.getEventId());
 		sendAnswerFeedBack();
 		return editRequest;
 	}
@@ -100,7 +125,7 @@ public class InvitationHandler extends UpdateHandler {
 		userFirst = callBack.getFrom().getFirstName();
 		response = callBack.getData();
 		HashSet<String> attendees = eventModel.getAttendees();
-		HashMap<String, Boolean> responses = eventModel.getTotalResponses();
+		Map<String, Boolean> responses = eventModel.getTotalResponses();
 
 
 		String[] responseArray = response.split(" ");

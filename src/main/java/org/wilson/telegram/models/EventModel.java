@@ -4,27 +4,45 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
+@Entity
+@Table(name = "events")
 
 public class EventModel {
 
 	private Long eventId;
 	private String eventText;
+	
+	@Transient
 	private List<List<InlineKeyboardButton>> eventGrid;
 	private Integer eventHost;
 	private String eventHostFirst;
+	
+	@Transient
 	private HashSet<String> attendees;
 	private int eventInputStage;
 	private String eventName;
 	private String eventLocation;
 	private String eventDate;
-	private Long channelId;
-	private HashMap<String, Boolean> totalResponses;
-
-
-	private HashSet<String> inLineMessageIds;
+	
+	@Transient
+	private Map<String, Boolean> totalResponses;
+	
+	@ElementCollection
+	private Set<String> inLineMessageIds;
 	
 	public EventModel(){
 		eventText = null;
@@ -38,7 +56,6 @@ public class EventModel {
 		eventLocation = null;
 		eventDate = null;
 		inLineMessageIds = new HashSet<String>();
-		channelId = null;
 		this.eventId = null;
 	}
 	
@@ -54,7 +71,6 @@ public class EventModel {
 		eventLocation = null;
 		eventDate = null;
 		inLineMessageIds = new HashSet<String>();
-		channelId = null;
 		this.eventId = eventId;
 	}
 	
@@ -66,137 +82,130 @@ public class EventModel {
 		totalResponses = new HashMap<String, Boolean>();
 		eventInputStage = 0;
 		inLineMessageIds = new HashSet<String>();
-		channelId = null;
 		this.eventId = null;
-		
 		this.eventName = eventName;
 		this.eventDate = eventDate;
 		this.eventLocation = eventLocation;
 		this.eventHost = eventHost;
-		
-		InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-		InlineKeyboardButton button = new InlineKeyboardButton();
-		InlineKeyboardButton button2 = new InlineKeyboardButton();
-		button.setText("Yes");
-		button.setCallbackData("Yes");
-		button2.setText("No");
-		button2.setCallbackData("No");
-		List<InlineKeyboardButton> buttons = new ArrayList();
-		buttons.add(button);
-		buttons.add(button2);
-		List<List<InlineKeyboardButton>> grid = new ArrayList();
-		grid.add(buttons);
-		this.eventGrid=grid;
-			
-		//Fix this duplicate here, we don't need to iterate over this when initiating the event
-
-		String attendeeString = "Attendees (" + attendees.size() + "): ";
-		String event = "<strong>" + eventName + "</strong>" + System.getProperty("line.separator") 
-				+ eventDate + System.getProperty("line.separator") 
-				+ "📍" + eventLocation + System.getProperty("line.separator") 
-
-				+ attendeeString;
-		
-		this.eventText = event;
 	}
 	
+	@Column(name = "event_text")
 	public String getEventText() {
 		return eventText;
 	}
 
-	public void setEventText(String eventText) {
-		this.eventText = eventText;
+	
+	@Column(name = "event_host")
+	public Integer getEventHost() {
+		return eventHost;
+	}
+	
+	@Column(name = "event_host_first")
+	public String getEventHostFirst() {
+		return eventHostFirst;
+	}
+	
+	@Column(name = "event_location")
+	public String getEventLocation() {
+		return eventLocation;
+	}
+	
+	@Column(name = "event_input_stage")
+	public int getEventInputStage() {
+		return eventInputStage;
+	}
+	
+	@Column(name = "event_name")
+	public String getEventName() {
+		return eventName;
+	}
+	
+	@Column(name = "event_date")
+	public String getEventDate() {
+		return eventDate;
+	}
+	
+	@Id
+	@Column(name = "event_id")
+	public Long getEventId() {
+		return eventId;
+	}
+	
+
+	@Transient
+	public Map<String, Boolean> getTotalResponses() {
+		return totalResponses;
 	}
 
-	public Integer getAttendeeNumber() {
-		return attendees.size();
+	@ElementCollection
+//	@CollectionTable(name = "inline_message_id", joinColumns = @JoinColumn(name = "inline_message_id"))
+//	@Column(name = "inline_message_id")
+	public Set<String> getInLineMessageId() {
+		return inLineMessageIds;
 	}
-
+	
+	@Transient
+	public HashSet<String> getAttendees() {
+		return attendees;
+	}
+	
+	@Transient
 	public List<List<InlineKeyboardButton>> getEventGrid() {
 		return eventGrid;
+	}
+	
+	public void setEventText(String eventText) {
+		this.eventText = eventText;
 	}
 
 	public void setEventGrid(List<List<InlineKeyboardButton>> eventGrid) {
 		this.eventGrid = eventGrid;
 	}
 
-	public Integer getEventHost() {
-		return eventHost;
-	}
-
 	public void setEventHost(Integer eventHost) {
 		this.eventHost = eventHost;
-	}
-
-	public String getEventHostFirst() {
-		return eventHostFirst;
 	}
 
 	public void setEventHostFirst(String eventHostFirst) {
 		this.eventHostFirst = eventHostFirst;
 	}
 
-	public HashSet<String> getAttendees() {
-		return attendees;
-	}
-
 	public void setAttendees(HashSet<String> attendees) {
 		this.attendees = attendees;
-	}
-
-	public int getEventInputStage() {
-		return eventInputStage;
 	}
 
 	public void setEventInputStage(int eventInputStage) {
 		this.eventInputStage = eventInputStage;
 	}
 
-	public String getEventName() {
-		return eventName;
-	}
+
 
 	public void setEventName(String eventName) {
 		this.eventName = eventName;
 	}
 
-	public String getEventLocation() {
-		return eventLocation;
-	}
 
 	public void setEventLocation(String eventLocation) {
 		this.eventLocation = eventLocation;
 	}
 
-	public String getEventDate() {
-		return eventDate;
-	}
+
 
 	public void setEventDate(String eventDate) {
 		this.eventDate = eventDate;
 	}
 	
-	public Long getChannelId() {
-		return channelId;
-	}
 
-	public void setChannelId(Long channelId) {
-		this.channelId = channelId;
+	public void setInLineMessageId(Set<String> inLineMessageId) {
+		this.inLineMessageIds = inLineMessageId;
 	}
 
 
-		
-	public HashMap<String, Boolean> getTotalResponses() {
-		return totalResponses;
-	}
 
 	public void setTotalResponses(HashMap<String, Boolean> totalResponses) {
 		this.totalResponses = totalResponses;
 	}
 
-	public Long getEventId() {
-		return eventId;
-	}
 
 	public void setEventId(Long eventId) {
 		this.eventId = eventId;
@@ -226,13 +235,7 @@ public class EventModel {
 		return hash;
 	}
 
-	public HashSet<String> getInLineMessageId() {
-		return inLineMessageIds;
-	}
 
-	public void setInLineMessageId(HashSet<String> inLineMessageId) {
-		this.inLineMessageIds = inLineMessageId;
-	}
 
 	
 
