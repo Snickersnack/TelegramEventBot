@@ -4,13 +4,22 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 
+import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
 import org.wilson.telegram.models.EditModel;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.util.EventFinder;
+import org.wilson.telegram.util.KeyboardBuilder;
+
+import persistence.HibernateUtil;
 
 /**
  */
+
 
 public class Cache {
 
@@ -19,7 +28,7 @@ public class Cache {
 	private HashMap<Integer, EventModel> inProgressEventCreations;
 	private HashMap<Integer, EditModel> inProgressEdit;
 	private HashMap<Long, HashSet<EventModel>> channelEventMap;
-	private HashSet<Long> persistenceQueue;
+	private HashSet<Long> persistenceQueue; //tabling this until i need it
 	private Long globalEventId;
 	private LocalDateTime currentTime;
 
@@ -43,6 +52,80 @@ public class Cache {
 	
 	public void init(){
 		
+		Session session = null;
+		try{
+			session = HibernateUtil.getSessionFactory().openSession();
+			Criteria crit = session.createCriteria(EventModel.class);
+			List<EventModel> events = crit.list();
+			
+			//populate master event map
+			Long maxId = 0L;
+			for(EventModel event : events){
+				if(event.getEventId()>maxId){
+					maxId = event.getEventId();
+				}
+				KeyboardBuilder kb = new KeyboardBuilder();
+				event.setEventGrid(kb.buildEventButtons());
+				Integer userId = event.getEventHost();
+				Hibernate.initialize(event.getTotalResponses());
+				Hibernate.initialize(event.getInLineMessageId());
+				Hibernate.initialize(event.getChannels());
+				//always add the user to the event map (even if we have no events for them)
+				HashSet<EventModel> eventSet = masterEventMap.get(userId);
+				if(eventSet == null){
+					eventSet = new HashSet<EventModel>();
+					masterEventMap.put(userId, eventSet);
+					
+				}
+				
+				//only add to master events if if's already completed
+				if(event.getEventInputStage() == 0){
+					eventSet.add(event);
+					System.out.println("event progress stage: " + event.getEventInputStage() );
+					System.out.println("event name: " + event.getEventName());
+				}
+				//if event stage isn't 0, put this into our inprogress
+				else{
+					if(inProgressEventCreations.get(userId) == null){
+						EventModel eventCopy = new EventModel(event.getEventId());
+						eventCopy.setEventHost(event.getEventHost());
+						eventCopy.setEventHostFirst(event.getEventHostFirst());
+						eventCopy.setEventName(event.getEventName());
+						eventCopy.setEventInputStage(event.getEventInputStage());
+						eventCopy.setEventLocation(event.getEventLocation());
+						eventCopy.setEventDate(event.getEventDate());
+						inProgressEventCreations.put(userId, eventCopy);
+					}
+				}
+				
+				
+				//add to channel map
+				for(Long channel : event.getChannels()){
+					HashSet<EventModel> channelEvents = channelEventMap.get(channel);
+					if( channelEvents == null){
+						channelEvents = new HashSet<EventModel>();
+						channelEventMap.put(channel, channelEvents);
+					}
+					channelEvents.add(event);
+				}
+				
+				System.out.println("adding event: " + event.getEventId());
+			}
+			globalEventId = maxId+1;
+			
+			System.out.println("Size of master event map: " + masterEventMap.size());		
+			System.out.println("Size of channel event map: " + channelEventMap.size());		
+			System.out.println("Size of inprogress event map: " + inProgressEventCreations.size());		
+			EventFinder.printAll(163396337);
+			System.out.println("size of event for me: " + masterEventMap.get(163396337).size());
+		}
+		finally{
+			if (session != null){
+			session.close();
+			}
+		}
+
+
 	}
 
 

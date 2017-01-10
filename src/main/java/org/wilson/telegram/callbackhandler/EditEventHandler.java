@@ -86,7 +86,7 @@ public class EditEventHandler {
 			}
 			
 			Cache.getInstance().getInProgressEdit().put(userId, editModel);
-		
+			
 
 			
 		}

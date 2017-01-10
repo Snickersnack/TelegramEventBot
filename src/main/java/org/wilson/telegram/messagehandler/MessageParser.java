@@ -8,6 +8,7 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboar
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.UpdateHandler;
 import org.wilson.telegram.config.BotConfig;
+import org.wilson.telegram.messagehandler.usermessage.UserMessageHelper;
 import org.wilson.telegram.templates.Commands;
 import org.wilson.telegram.util.KeyboardBuilder;
 

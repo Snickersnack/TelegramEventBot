@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.util.EventPersistence;
 
 public class DateEventCleanup implements Runnable{
 
@@ -46,6 +47,8 @@ public class DateEventCleanup implements Runnable{
 					if(currentSeconds - eventSeconds >= EXPIRATION_TIME){
 						System.out.println("removed event: " + event.getEventName());
 						it.remove();
+						EventPersistence.delete(event);
+
 					}
 					
 				}

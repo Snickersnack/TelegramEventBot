@@ -2,7 +2,11 @@ package org.wilson.telegram.util;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -10,6 +14,8 @@ import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.templates.EventDelete;
 import org.wilson.telegram.templates.EventEdit;
+
+import persistence.HibernateUtil;
 
 public class EventBuilder {
 	
@@ -86,23 +92,31 @@ public class EventBuilder {
 		String eventLocation = eventModel.getEventLocation();
 		String eventDate = eventModel.getEventDate();
 		String eventHostFirst = eventModel.getEventHostFirst();
-		HashSet<String> attendees = eventModel.getAttendees();
-		Integer newAttendee = attendees.size();
-		String attendeeList = "👥  (" + newAttendee + "): ";
-		int counter = 1;
-		if (!attendees.isEmpty()) {
-			for (String item : attendees) {
-				if (counter == attendees.size()) {
-					attendeeList += " " + item;
-				} else {
-					attendeeList += " " + item + ", ";
+//		EventPersistence.initialize(eventModel);
 
-				}
-				counter++;
-			}
-		}
+		Map<String, Boolean> attendees = eventModel.getTotalResponses();
+
 		
 
+
+		StringBuilder ab = new StringBuilder();
+		Integer attendeeSize = 0;
+		if (!attendees.isEmpty()) {
+			for (Entry<String, Boolean> item : attendees.entrySet()) {	
+				if(item.getValue()){
+						ab.append(" " + item.getKey() + ",");
+						attendeeSize++;
+				}
+			}
+		}
+		String attendeeList = "👥  (" + attendeeSize + "): ";
+		
+		if(attendeeSize == 0){
+			attendeeList = attendeeList + "<i>No one has responded yet</i>";
+		}else{
+			attendeeList = attendeeList + ab.toString().substring(0, ab.length() - 1);
+		}
+		
 		
 		eventText = "<strong>" + eventName + "</strong>"
 				+ System.getProperty("line.separator") + eventDate

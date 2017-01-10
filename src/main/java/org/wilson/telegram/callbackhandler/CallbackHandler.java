@@ -19,6 +19,7 @@ import org.wilson.telegram.templates.EventEdit;
 import org.wilson.telegram.templates.EventMenu;
 import org.wilson.telegram.templates.EventRespondees;
 import org.wilson.telegram.templates.EventResponse;
+import org.wilson.telegram.util.EventPersistence;
 import org.wilson.telegram.util.KeyboardBuilder;
 import org.wilson.telegram.util.RespondeesCommand;
 
@@ -113,16 +114,15 @@ public class CallbackHandler {
 				
 				//proceed with event deletion
 				if(dataArray[1].equals(EventClear.ACCEPT)){
+					EventPersistence.deleteAll(userId);
 					Cache.getInstance().clearUserEvents(userId);
 					editMessageRequest.setText(EventClear.CLEARED);
-
 				
 				//If not deleting, provide menu
 				}else{
 					KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
 					InlineKeyboardMarkup markup = keyboardBuilder.buildMenu();
 					editMessageRequest.setReplyMarkup(markup);
-
 					editMessageRequest.setText(EventMenu.MENUINTRO);
 
 				}

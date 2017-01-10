@@ -61,6 +61,7 @@ public class EventFinder {
 			while (it.hasNext()) {
 				EventModel eventModel = it.next();
 				if (eventModel.equals(event)) {
+					EventPersistence.delete(event);
 					it.remove();
 					found = true;
 					break;
@@ -89,7 +90,10 @@ public class EventFinder {
 		HashSet<EventModel> userSet = Cache.getInstance().getMasterEventMap().get(userId);
 			
 			for(EventModel userEvent : userSet){
+				System.out.println("current in cache: " + userEvent.getEventName());
 				if(userEvent.getEventName().equals(eventName)){
+					System.out.println("name of input: " + userEvent.getEventName());
+
 					return userEvent;
 				}
 			}
@@ -97,13 +101,19 @@ public class EventFinder {
 		return null;
 	}
 	
-	
+	public static void printAll(Integer userId){
+		HashSet<EventModel> userSet = Cache.getInstance().getMasterEventMap().get(userId);
+		for(EventModel userEvent : userSet){
+			System.out.println(userEvent.getEventName());
+		}
+	}
 	public static EventModel findEventByInlineMessageId(String inLineMessageId) {
 		HashMap<Integer, HashSet<EventModel>>map = Cache.getInstance().getMasterEventMap();
 		EventModel eventModel = new EventModel();
 		for (Entry<?, HashSet<EventModel>> entry : map.entrySet()) {
 			if (!entry.getValue().isEmpty()) {
 				for (EventModel event : entry.getValue()) {
+//					EventPersistence.initialize(event);
 					if (event.getInLineMessageId().contains(inLineMessageId)) {
 						eventModel = event;
 						return eventModel;

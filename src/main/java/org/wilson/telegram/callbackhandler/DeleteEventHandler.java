@@ -13,6 +13,7 @@ import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.templates.EventDelete;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
+import org.wilson.telegram.util.EventPersistence;
 import org.wilson.telegram.util.KeyboardBuilder;
 
 public class DeleteEventHandler extends UpdateHandler{

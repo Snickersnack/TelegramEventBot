@@ -19,6 +19,7 @@ import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
+import org.wilson.telegram.util.EventPersistence;
 import org.wilson.telegram.util.KeyboardBuilder;
 
 import persistence.HibernateUtil;
@@ -50,18 +51,22 @@ public class EventStartCommand {
 		
 		EventModel newEvent = new EventModel();
 		newEvent.setEventHostFirst(user.getFirstName());
+		newEvent.setEventHost(userId);
 		newEvent.setEventInputStage(1);
 
 		HashMap<Integer, EventModel> inProgressCache = Cache.getInstance().getInProgressEventCreations();
 
 		inProgressCache.put(userId, newEvent);
 
+		newEvent = Cache.getInstance().registerEvent(newEvent);
+		EventPersistence.save(newEvent);
 
-		Cache.getInstance().setInProgressEventCreations(inProgressCache);
 		sendMessageRequest.setText(
 				"<strong>Event Creation</strong>"
 				+ System.getProperty("line.separator")
-				+ "Use /start to start from the beginning. Use /cancel to exit"
+				+ System.getProperty("line.separator")
+
+				+ "<i>Use</i> /start <i>to start from the beginning. Use</i> /cancel <i>to exit</i>"
 				+ System.getProperty("line.separator")
 				+ System.getProperty("line.separator")
 				+ System.getProperty("line.separator")
@@ -80,21 +85,28 @@ public class EventStartCommand {
 		int stage = inProgressMap.get(userId).getEventInputStage();
 
 		EventModel inProgressEventItem = inProgressMap.get(userId);
+		
 		SendMessage sendMessageRequest = new SendMessage();
 		sendMessageRequest.setChatId(message.getChatId());
 		
 
 			if(stage == 1){
+				EventFinder.printAll(userId);
 				inProgressEventItem.setEventName(message.getText());
-
+				System.out.println("here's the event name: " + inProgressEventItem.getEventName());
 				//If event already exists, request another input
 				EventModel temp = EventFinder.findEventbyNameUser(inProgressEventItem.getEventName(), userId);
 				if(temp != null){
 					sendMessageRequest.setText("You already have an event with this name. Please try another name");
 				}else{
-					sendMessageRequest.setText("What is the date of this event? Use month/date format (e.g. 01/21/2018 10:00PM)");
+					sendMessageRequest.setText("What is the date of this event?"
+							+ System.getProperty("line.separator")
+							+ System.getProperty("line.separator")
+
+							+ "<i>Use month/date format (e.g. 01/21/2018 10:00PM)</i>");
+					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
 					inProgressEventItem.setEventInputStage(2);
-					
+					EventPersistence.update(inProgressEventItem);
 				}
 			}else if(stage == 2){
 				try{
@@ -111,17 +123,17 @@ public class EventStartCommand {
 						return sendMessageRequest;
 					}
 
-					
 					inProgressEventItem.setEventDate(date);
 					sendMessageRequest.setText("Where is the location of this event?");
 					inProgressEventItem.setEventInputStage(3);
+					EventPersistence.update(inProgressEventItem);
 
 
 
 
 				}catch(Exception e){
 					System.out.println(e);
-					sendMessageRequest.setText("Please specify the date in the correct format <strong>(e.g. 01/21/2018)</strong>");
+					sendMessageRequest.setText("<i>Please specify the date in the correct format</i> <strong>(e.g. 01/21/2018)</strong>");
 					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
 					return sendMessageRequest;
 				}
@@ -146,27 +158,8 @@ public class EventStartCommand {
 				sendMessageRequest.setText("Event Created!");
 				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
 			
-				
-				Session session = null;
-				try{
-					session =  HibernateUtil.getSessionFactory().openSession();
-					session.beginTransaction(); 
-					newEvent.setEventInputStage(0);
-					session.save(newEvent); 
-					session.getTransaction().commit();
-
-				}catch(ConstraintViolationException e){
-					System.out.println("did not consume: " + newEvent.getEventId());
-					session.getTransaction().rollback();
-				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
-				finally{
-					if (session != null){
-					session.close();
-					}
-				}
+				newEvent.setEventInputStage(0);
+				EventPersistence.saveOrUpdate(newEvent);
 				//clear item for this user from cache.
 
 				inProgressMap.put(userId, null);
@@ -184,20 +177,18 @@ public class EventStartCommand {
     	EventModel newEvent = Cache.getInstance().getInProgressEventCreations().get(userId);
     	System.out.println("new event name: " + newEvent.getEventName());
     	HashSet<EventModel> mapSet = map.get(userId);
-    	
-    	System.out.println("Event start command: " + userId);
-		
+    			
 		KeyboardBuilder eventKeyBoard = new KeyboardBuilder();
 		List<List<InlineKeyboardButton>> newKeyboard = eventKeyBoard.buildEventButtons();
 		newEvent.setEventGrid(newKeyboard);
 		String event = EventBuilder.build(newEvent);
-		//Add event to the set, then add to map and return map
 		newEvent.setEventText(event);
 		newEvent.setEventHost(userId);
 		newEvent.setEventHostFirst(message.getFrom().getFirstName());
-		newEvent = Cache.getInstance().registerEvent(newEvent);
-		mapSet.add(newEvent);
-		Cache.getInstance().getPersistenceQueue().add(newEvent.getEventId());
+
+		System.out.println(mapSet.add(newEvent));
+		System.out.println(mapSet.size());
+
 		return newEvent;
     }
 }

@@ -1,6 +1,6 @@
 package org.wilson.telegram.util;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
@@ -9,35 +9,131 @@ import org.wilson.telegram.models.EventModel;
 
 import persistence.HibernateUtil;
 
-public class EventPersistence implements Runnable{
+public class EventPersistence{
 
-	public void run(){
-		HashSet<Long> persistenceQueue = Cache.getInstance().getPersistenceQueue();
-		if(persistenceQueue.size() > 0){
-			for(Long eventId : persistenceQueue){
-				EventModel temp = new EventModel(eventId);
-				EventModel event = EventFinder.findEvent(temp, Cache.getInstance().getMasterEventMap());
-				Session session = null;
-				try{
-					session =  HibernateUtil.getSessionFactory().openSession();
-					session.beginTransaction(); 
-					session.saveOrUpdate(event); 
-					session.getTransaction().commit();
+	
+	public static void delete(EventModel event){
+		Session session = null;
+		try{
+			System.out.println("deleting: " + event.getEventName());
+			session =  HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction(); 
+			session.delete(event); 
+			session.getTransaction().commit();
 
-				}catch(ConstraintViolationException e){
-					System.out.println("did not consume: " + event.getEventName());
-					session.getTransaction().rollback();
-				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
-				finally{
-					if (session != null){
-					session.close();
-					}
-				}
+		}catch(ConstraintViolationException e){
+			System.out.println("did not delete: " + event.getEventName());
+			session.getTransaction().rollback();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			if (session != null){
+			session.close();
 			}
-
 		}
 	}
-}
+	
+	public static void update(EventModel event){
+		Session session = null;
+		try{
+			session =  HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction(); 
+			session.update(event); 
+			session.getTransaction().commit();
+
+		}catch(ConstraintViolationException e){
+			System.out.println("did not delete: " + event.getEventName());
+			session.getTransaction().rollback();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			if (session != null){
+			session.close();
+			}
+		}
+	}
+	
+	
+	public static void saveOrUpdate(EventModel event){
+		Session session = null;
+		try{
+			session =  HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction(); 
+			session.saveOrUpdate(event); 
+			session.getTransaction().commit();
+
+		}catch(ConstraintViolationException e){
+			System.out.println("did not consume: " + event.getEventName());
+			session.getTransaction().rollback();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			if (session != null){
+			session.close();
+			}
+		}
+	}
+	
+	
+//	public static void initialize(EventModel event){
+//		Session session = null;
+//		try{
+//			session = HibernateUtil.getSessionFactory().openSession();
+//			session.refresh(event);
+//
+//
+//
+//		}catch(Exception e){
+//			
+//		}finally{
+//			if(session != null){
+//				session.close();
+//			}
+//		}
+//		
+//	}
+	
+	public static void save(EventModel event){
+		Session session = null;
+		try{
+			session =  HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction(); 
+			session.save(event); 
+			session.getTransaction().commit();
+
+		}catch(ConstraintViolationException e){
+			System.out.println("did not consume: " + event.getEventName());
+			session.getTransaction().rollback();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			if (session != null){
+			session.close();
+			}
+		}
+		
+	}
+	
+	
+	public static void deleteAll(Integer userId){
+		Set<EventModel> set = Cache.getInstance().getMasterEventMap().get(userId);
+		EventFinder.printAll(userId);
+		System.out.println(set.size());
+		System.out.println(userId);
+		for(EventModel event : set){
+			System.out.println(event.getEventName());
+			delete(event);
+		}
+	}
+
+		
+	}
+

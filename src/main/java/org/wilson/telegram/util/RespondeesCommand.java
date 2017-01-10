@@ -49,6 +49,7 @@ public class RespondeesCommand extends UpdateHandler {
 				sb.append(System.getProperty("line.separator"));
 
 				int count = 1;
+				
 				for (Entry<String, Boolean> entry : event.getTotalResponses()
 						.entrySet()) {
 

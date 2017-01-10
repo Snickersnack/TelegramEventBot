@@ -22,6 +22,7 @@ public class Main {
 
         
     	ApiContextInitializer.init();
+    	Cache.getInstance().init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
 
         try {

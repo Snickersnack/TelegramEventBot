@@ -26,31 +26,15 @@ public final class CacheUpdater {
 		HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
 		EventModel tempEvent = new EventModel(Long.parseLong(resultId));
 		EventModel foundEvent = EventFinder.findEvent(tempEvent, map);
-		
+//		EventPersistence.initialize(foundEvent);
+
 		//search based on the ResultId
 		Set<String> set = foundEvent.getInLineMessageId();
-		set.add(inLineMessageId);
-
-		Session session = null;
-		try{
-			session =  HibernateUtil.getSessionFactory().openSession();
-			session.beginTransaction(); 
-			session.saveOrUpdate(foundEvent); 
-			session.getTransaction().commit();
-
-		}catch(ConstraintViolationException e){
-			System.out.println("did not consume: " + foundEvent.getEventName());
-			session.getTransaction().rollback();
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-		finally{
-			if (session != null){
-			session.close();
-			}
-		}
 		
+		
+		if(set.add(inLineMessageId)){
+			EventPersistence.saveOrUpdate(foundEvent);
+		}
 	}
 	
 
@@ -73,6 +57,11 @@ public final class CacheUpdater {
 		
 		
 		newEvent = EventFinder.findEventbyName(eventName);
+//		EventPersistence.initialize(newEvent);
+		Set<Long> channels = newEvent.getChannels();
+		channels.add(channelId);
+		
+		
 		channelSet.add(newEvent);
 		// is it already in channelMap?
 		// if not find and add to channelMap from userMap (linking events)

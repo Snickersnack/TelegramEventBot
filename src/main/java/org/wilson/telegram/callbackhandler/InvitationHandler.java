@@ -20,6 +20,7 @@ import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.templates.EventResponse;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
+import org.wilson.telegram.util.EventPersistence;
 
 import persistence.HibernateUtil;
 
@@ -71,8 +72,7 @@ public class InvitationHandler extends UpdateHandler {
 		}
 		
 		//build the eventtext
-		HashSet<String> updatedAttendees = updateAttendees();
-		eventModel.setAttendees(updatedAttendees);
+		updateAttendees();
 		String eventText = EventBuilder.build(eventModel);
 		eventModel.setEventText(eventText);
 		
@@ -85,25 +85,7 @@ public class InvitationHandler extends UpdateHandler {
 		editRequest.setText(eventText);
 		editRequest.setReplyMarkup(markup);
 		
-		Session session = null;
-		try{
-			session =  HibernateUtil.getSessionFactory().openSession();
-			session.beginTransaction(); 
-			session.saveOrUpdate(eventModel); 
-			session.getTransaction().commit();
-
-		}catch(ConstraintViolationException e){
-			System.out.println("did not consume: " + eventModel.getEventName());
-			session.getTransaction().rollback();
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-		finally{
-			if (session != null){
-			session.close();
-			}
-		}
+		EventPersistence.saveOrUpdate(eventModel);
 //		Cache.getInstance().getPersistenceQueue().add(eventModel.getEventId());
 		sendAnswerFeedBack();
 		return editRequest;
@@ -121,27 +103,24 @@ public class InvitationHandler extends UpdateHandler {
 		}
 	}
 	
-	private HashSet<String> updateAttendees(){
+	private void updateAttendees(){
 		userFirst = callBack.getFrom().getFirstName();
 		response = callBack.getData();
-		HashSet<String> attendees = eventModel.getAttendees();
+//		EventPersistence.initialize(eventModel);
 		Map<String, Boolean> responses = eventModel.getTotalResponses();
-
 
 		String[] responseArray = response.split(" ");
 		response = responseArray[0];
 		
 		if (response.equals(EventResponse.ACCEPT)) {
-				attendees.add(userFirst);
 				System.out.println(responses.put(userFirst, true));
+				
 			 
 		} else {
-				attendees.remove(userFirst);
 				System.out.println(responses.put(userFirst, false));
 
 			
 		}
-		return attendees;
 	}
 	
 
