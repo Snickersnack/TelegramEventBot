@@ -7,10 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.exception.ConstraintViolationException;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -21,8 +20,6 @@ import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
 import org.wilson.telegram.util.EventPersistence;
 import org.wilson.telegram.util.KeyboardBuilder;
-
-import persistence.HibernateUtil;
 
 public class EventStartCommand {
 
@@ -91,7 +88,7 @@ public class EventStartCommand {
 		
 
 			if(stage == 1){
-				EventFinder.printAll(userId);
+//				EventFinder.printAll(userId);
 				inProgressEventItem.setEventName(message.getText());
 				System.out.println("here's the event name: " + inProgressEventItem.getEventName());
 				//If event already exists, request another input
@@ -143,8 +140,15 @@ public class EventStartCommand {
 			//date is substring(0,10)
 			}else if(stage == 3){
 				inProgressEventItem.setEventLocation(message.getText());
+//				sendMessageRequest.setText("Attach an image to this event or /skip");
+//				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
+//				inProgressEventItem.setEventInputStage(4);
+//
+//				
+//			}else if (stage == 4){
+				
 				EventModel newEvent = generateNewEvent(message);
-		
+				
 				//Generate a return keyboard button
 		
 				KeyboardBuilder keyboardBuilder = new KeyboardBuilder(1,1);
@@ -163,7 +167,6 @@ public class EventStartCommand {
 				//clear item for this user from cache.
 
 				inProgressMap.put(userId, null);
-				
 			}
 		
 
@@ -172,12 +175,15 @@ public class EventStartCommand {
 	}
 
     public static EventModel generateNewEvent(Message message){
+    	
+    	
     	Integer userId = message.getFrom().getId();
     	HashMap<Integer, HashSet<EventModel>> map = Cache.getInstance().getMasterEventMap();
     	EventModel newEvent = Cache.getInstance().getInProgressEventCreations().get(userId);
     	System.out.println("new event name: " + newEvent.getEventName());
     	HashSet<EventModel> mapSet = map.get(userId);
-    			
+
+		
 		KeyboardBuilder eventKeyBoard = new KeyboardBuilder();
 		List<List<InlineKeyboardButton>> newKeyboard = eventKeyBoard.buildEventButtons();
 		newEvent.setEventGrid(newKeyboard);
@@ -185,7 +191,7 @@ public class EventStartCommand {
 		newEvent.setEventText(event);
 		newEvent.setEventHost(userId);
 		newEvent.setEventHostFirst(message.getFrom().getFirstName());
-
+		
 		System.out.println(mapSet.add(newEvent));
 		System.out.println(mapSet.size());
 

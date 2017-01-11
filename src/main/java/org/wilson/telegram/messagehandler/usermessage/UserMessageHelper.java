@@ -2,10 +2,12 @@ package org.wilson.telegram.messagehandler.usermessage;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -70,6 +72,7 @@ public class UserMessageHelper extends MessageParser{
 			}
 		}
 		
+
 		else if(command.startsWith(Commands.MENUCOMMAND)){
 			KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
 			InlineKeyboardMarkup markup = keyboardBuilder.buildMenu();

@@ -22,13 +22,13 @@ public final class Commands {
     public static final String CANCELCOMMAND = INIT_CHAR + "cancel";
     public static final String RESPONDEESCOMMAND = INIT_CHAR + "respondees";
     
-    public static final String HELPTEXT =  "Begin typing @" + BotConfig.USERNAMENEWBOT + " to start a new event"
+    public static final String HELPTEXT =  "Begin typing @" + BotConfig.BOTUSERNAME + " to start a new event"
     		+ System.getProperty("line.separator")
     		+ System.getProperty("line.separator") + "Share events across channels. Events shared to channels that have this bot will be added to the /view command"
     		+ System.getProperty("line.separator")
     		+ System.getProperty("line.separator") + "Use /view to see all events shared to this channel"
     		+ System.getProperty("line.separator")
-			+ System.getProperty("line.separator") + "Message /menu to @" + BotConfig.USERNAMENEWBOT + " to manage your events and see who's responded"
+			+ System.getProperty("line.separator") + "Message /menu to @" + BotConfig.BOTUSERNAME + " to manage your events and see who's responded"
 			+ System.getProperty("line.separator");
 
 }

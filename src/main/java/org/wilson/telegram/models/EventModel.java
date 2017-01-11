@@ -41,6 +41,8 @@ public class EventModel {
 	private String eventLocation;
 	private String eventDate;
 	
+	private byte[] image;
+	
 	private Set<Long> channels;
 	
 
@@ -155,6 +157,15 @@ public class EventModel {
 		return channels;
 	}
 
+	@Transient
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+
 	public void setChannels(Set<Long> channels) {
 		this.channels = channels;
 	}
@@ -230,7 +241,6 @@ public class EventModel {
 		return true;
 	}
 	
-	//incompatible with the edit event feature. We can't allow modification of the field we key our events to
 	@Override
 	public int hashCode(){
 		int hash = 17;

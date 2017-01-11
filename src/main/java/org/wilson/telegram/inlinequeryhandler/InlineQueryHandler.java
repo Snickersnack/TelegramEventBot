@@ -34,21 +34,38 @@ public class InlineQueryHandler {
 		//Searches on the userEventMap
 		HashSet<EventModel> userSet = cachedEvents.get(userId);
 		if(userSet!= null && !userSet.isEmpty()){
+			int count = 0;
 			for(EventModel event : cachedEvents.get(userId)){
+			
+				InputTextMessageContent content = new InputTextMessageContent();
+				content.setMessageText("<a href=\"http://i.imgur.com/GK2OaMx.jpg\">Event</a> " 
+						+  System.getProperty("line.separator")
+						+ event.getEventText());
+				content.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+				content.setDisableWebPagePreview(false);
+				
+				
 				
 				//Build our list of AnswerInline Results off of each event
 				InlineQueryResultArticle qResultArticle = new InlineQueryResultArticle();
-				InputTextMessageContent content = new InputTextMessageContent();
-				content.setMessageText(event.getEventText());
-				content.setParseMode(BotConfig.MESSAGE_MARKDOWN);
-				qResultArticle.setInputMessageContent(content);
+				
+
+				
+				
 				InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 				markup.setKeyboard(event.getEventGrid());
+				if(count%2 == 0){
+					qResultArticle.setThumbUrl("http://i.imgur.com/GK2OaMx.jpg");
+
+				}
+//				qResultArticle.setUrl("http://i.imgur.com/GK2OaMx.jpg");
 				qResultArticle.setReplyMarkup(markup);
+				qResultArticle.setInputMessageContent(content);
 				qResultArticle.setId(event.getEventId().toString());
 				qResultArticle.setTitle(event.getEventName());
+				qResultArticle.setHideUrl(false);
 				list.add(qResultArticle);
-			
+			count++;
 			}	
 
 		}
@@ -76,11 +93,11 @@ public class InlineQueryHandler {
 		aQuery.setResults(list);
 		aQuery.setCacheTime(1);
 		
-		for(InlineQueryResult result : aQuery.getResults()){
-			InlineQueryResultArticle art = (InlineQueryResultArticle) result;
+//		for(InlineQueryResult result : aQuery.getResults()){
+//			InlineQueryResultArticle art = (InlineQueryResultArticle) result;
 //			System.out.println("Article ids: " + art.getId());
-			
-		}
+//			
+//		}
 		
 		return aQuery;
 		

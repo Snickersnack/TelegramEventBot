@@ -113,11 +113,11 @@ public class Cache {
 			}
 			globalEventId = maxId+1;
 			
-			System.out.println("Size of master event map: " + masterEventMap.size());		
-			System.out.println("Size of channel event map: " + channelEventMap.size());		
-			System.out.println("Size of inprogress event map: " + inProgressEventCreations.size());		
-			EventFinder.printAll(163396337);
-			System.out.println("size of event for me: " + masterEventMap.get(163396337).size());
+//			System.out.println("Size of master event map: " + masterEventMap.size());		
+//			System.out.println("Size of channel event map: " + channelEventMap.size());		
+//			System.out.println("Size of inprogress event map: " + inProgressEventCreations.size());		
+//			EventFinder.printAll(163396337);
+//			System.out.println("size of event for me: " + masterEventMap.get(163396337).size());
 		}
 		finally{
 			if (session != null){

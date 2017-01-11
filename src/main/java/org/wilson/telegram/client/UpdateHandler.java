@@ -1,11 +1,23 @@
 package org.wilson.telegram.client;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
 import org.telegram.telegrambots.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
+import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.api.objects.CallbackQuery;
+import org.telegram.telegrambots.api.objects.File;
 import org.telegram.telegrambots.api.objects.Message;
+import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -14,7 +26,9 @@ import org.wilson.telegram.callbackhandler.EditTextCallback;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.inlinequeryhandler.InlineQueryHandler;
 import org.wilson.telegram.messagehandler.MessageParser;
+import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.util.CacheUpdater;
+import org.wilson.telegram.util.KeyboardBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,8 +38,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 
 public class UpdateHandler extends TelegramLongPollingBot {
-	private static final String TOKEN = BotConfig.TOKENNEWBOT;
-	private static final String BOTNAME = BotConfig.USERNAMENEWBOT;
+	private static final String TOKEN = BotConfig.BOTTOKEN;
+	private static final String BOTNAME = BotConfig.BOTUSERNAME;
 
 	ObjectMapper mapper = new ObjectMapper();
 
@@ -64,6 +78,7 @@ public class UpdateHandler extends TelegramLongPollingBot {
 			AnswerInlineQuery aQuery = iq.handleInlineQuery(update);
 			return aQuery;
 		}
+
 		else if (update.hasCallbackQuery()) {
 			BotApiMethod<?> request = CallbackHandler.parse(update);
 

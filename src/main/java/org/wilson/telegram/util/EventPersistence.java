@@ -125,7 +125,6 @@ public class EventPersistence{
 	
 	public static void deleteAll(Integer userId){
 		Set<EventModel> set = Cache.getInstance().getMasterEventMap().get(userId);
-		EventFinder.printAll(userId);
 		System.out.println(set.size());
 		System.out.println(userId);
 		for(EventModel event : set){
