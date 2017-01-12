@@ -55,13 +55,15 @@ public class EventFinder {
 	public static boolean deleteEvent(EventModel event){
 		HashMap<Integer, HashSet<EventModel>> newMap = Cache.getInstance().getMasterEventMap();
 		boolean found = false;
+		
+		//remove from master
 		try{
 			HashSet<EventModel> set = newMap.get(event.getEventHost());
 			Iterator<EventModel> it = set.iterator();
 			while (it.hasNext()) {
 				EventModel eventModel = it.next();
 				if (eventModel.equals(event)) {
-					EventPersistence.delete(event);
+					EventPersistence.delete(eventModel);
 					it.remove();
 					found = true;
 					break;
@@ -70,15 +72,46 @@ public class EventFinder {
 		}catch(Exception e){
 			System.out.println(e);
 		}
+		
+		//remove from channelMap
+		HashMap<Long, HashSet<EventModel>> channel = Cache.getInstance().getChannelEventMap();
+		for(Entry<Long, HashSet<EventModel>> item : channel.entrySet()){
+			HashSet<EventModel> set = item.getValue();
+			try{
+				Iterator<EventModel> it = set.iterator();
+				while (it.hasNext()) {
+					EventModel eventModel = it.next();
+					if (eventModel.equals(event)) {
+						it.remove();
+					}
+				}	
+			}catch(Exception e){
+				System.out.println(e);
+			}
+		}
+
 		return found;
 	}
 	
+	//Find event by name only works because the bot only reads what it has forwarded (via "bot name")
+	//This means that you can't paste the exact eventname to another channel because the bot won't pick it up
+	//However, since we don't have globally unique event names, it's possible that two differenet users can share the
+	//exact same name. It's also possible for users to forward "via" messages so we can have a situation where 
+	//two different users are forwarding the exact name. Thus, we need to make a check on both userId and eventname
 	
-	public static EventModel findEventbyName(String eventName){
+	//This also allows us to have a way to optionally make events "public". We can allow different users to forward
+	//the event even if they were not the creator and have it added to the /view command. 
+	public static EventModel findEventbyName(String eventName, Integer userId){
 		HashMap<Integer, HashSet<EventModel>> masterEventMap = Cache.getInstance().getMasterEventMap();
 		for(Entry<Integer, HashSet<EventModel>> item : masterEventMap.entrySet()){
 			for(EventModel userEvent : item.getValue()){
 				if(userEvent.getEventName().equals(eventName)){
+					if(userId != null){
+						if(userId == userEvent.getEventHost()){
+							return userEvent;
+						}
+					}
+					System.out.println("found: " + eventName);
 					return userEvent;
 				}
 			}

@@ -112,13 +112,8 @@ public class MessageParser extends UpdateHandler {
 				sendMessageRequest.setText(Commands.HELPTEXT);
 			}
 			else if(message.isUserMessage()){
-				if(command.startsWith(Commands.VIEWCOMMAND)){
-					String text = "View lists all events shared to a channel, not a user. Use /view in a channel";
-					sendMessageRequest.setText(text);
-				}else{
-					UserMessageHelper userMessage = new UserMessageHelper(sendMessageRequest);
-					return userMessage.parse(message);		
-				}
+				UserMessageHelper userMessage = new UserMessageHelper(sendMessageRequest);
+				return userMessage.parse(message);		
 
 								
 				

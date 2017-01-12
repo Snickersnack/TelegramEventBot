@@ -11,6 +11,7 @@ import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.commandprocesses.EventStartCommand;
 import org.wilson.telegram.config.BotConfig;
@@ -81,7 +82,7 @@ public class UserMessageHelper extends MessageParser{
 			sb.append(EventMenu.MENUTITLE);
 			sb.append(System.getProperty("line.separator"));
 			sb.append(System.getProperty("line.separator"));
-			sb.append("<i>Select an action below</i>");
+			sb.append(EventMenu.MENUDESCRIPTION);
 			sb.append(System.getProperty("line.separator"));
 			sendMessageRequest.setText(sb.toString());
 
@@ -92,6 +93,15 @@ public class UserMessageHelper extends MessageParser{
 			RespondeesCommand respond = new RespondeesCommand();
 			respond.buildSend(userId, chatId);
 			return null;
+		}
+		
+		else if(command.startsWith(Commands.VIEWCOMMAND)){
+			boolean eventsSent = sendViewCommand(userId);
+			if (!eventsSent) {
+				sendMessageRequest.setText("You currently have no events!");
+			} else {
+				return null;
+			}
 		}
 		
 		//Provides a bunch of buttons. Actual edit is handled in the callback handler
@@ -133,6 +143,7 @@ public class UserMessageHelper extends MessageParser{
 			
 		} else if (command.startsWith(Commands.CLEAREVENTSCOMMAND)) {
 			
+			
 			sendMessageRequest.setText("Are you sure you want to remove all your events?");
 			sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 			KeyboardBuilder kb = new KeyboardBuilder(1,2);
@@ -164,5 +175,32 @@ public class UserMessageHelper extends MessageParser{
 		}
 		
 		return sendMessageRequest;
+	}
+	
+	private boolean sendViewCommand(Integer userId) {
+		HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
+		boolean shared = false;
+		HashSet<EventModel> userEvents = userMap.get(userId);
+		
+		if (userEvents != null) {
+			if (userEvents.size() != 0) {
+				shared = true;
+				for (EventModel event : userEvents) {
+					InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+					markup.setKeyboard(event.getEventGrid());
+					sendMessageRequest.setReplyMarkup(markup);
+					sendMessageRequest.setText(event.getEventText());
+					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+					try {
+						sendMessage(sendMessageRequest);
+					} catch (TelegramApiException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+//		sendMessageRequest = new SendMessage();
+		return shared;
 	}
 }

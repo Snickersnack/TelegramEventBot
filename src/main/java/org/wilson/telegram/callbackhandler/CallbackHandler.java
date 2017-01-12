@@ -99,12 +99,17 @@ public class CallbackHandler {
 		}
 		else if(callbackType.equals(EventClear.TYPE)){
 			HashSet<EventModel> set = Cache.getInstance().getMasterEventMap().get(userId);
+			StringBuilder sb = new StringBuilder();
+			sb.append(EventClear.TITLE
+							+ System.getProperty("line.separator")
+							+ System.getProperty("line.separator"));
 			if( set == null || set.size() == 0){
 				InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 				KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
 				markup = keyboardBuilder.buildReturnMenu();
 				editMessageRequest.setReplyMarkup(markup);
-				editMessageRequest.setText(EventClear.NOEVENTS);
+				sb.append(EventClear.NOEVENTS);
+				editMessageRequest.setText(sb.toString());
 				editMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 				
 			}
@@ -116,7 +121,13 @@ public class CallbackHandler {
 				if(dataArray[1].equals(EventClear.ACCEPT)){
 					EventPersistence.deleteAll(userId);
 					Cache.getInstance().clearUserEvents(userId);
-					editMessageRequest.setText(EventClear.CLEARED);
+					sb.append(EventClear.CLEARED);
+					editMessageRequest.setText(sb.toString());
+					InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+					KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
+					markup = keyboardBuilder.buildReturnMenu();
+					editMessageRequest.setReplyMarkup(markup);
+					editMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 				
 				//If not deleting, provide menu
 				}else{
@@ -129,8 +140,8 @@ public class CallbackHandler {
 			
 			//Ask for confirmation of deletion
 			}else{
-				
-				editMessageRequest.setText(EventClear.CONFIRMATION);
+				sb.append(EventClear.CONFIRMATION);
+				editMessageRequest.setText(sb.toString());
 				KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
 				InlineKeyboardMarkup markup = keyboardBuilder.buildClearConfirmation();
 				editMessageRequest.setReplyMarkup(markup);

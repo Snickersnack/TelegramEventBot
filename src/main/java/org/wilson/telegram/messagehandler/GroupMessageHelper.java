@@ -48,18 +48,17 @@ public class GroupMessageHelper extends MessageParser{
 	
 	private boolean sendViewCommand(Long channelId) {
 		HashMap<Long, HashSet<EventModel>> channelMap = Cache.getInstance().getChannelEventMap();
-		EventModel event;
 		boolean shared = false;
 		HashSet<EventModel> channelEvents = channelMap.get(channelId);
+		
 		if (channelEvents != null) {
 			if (channelEvents.size() != 0) {
 				shared = true;
 				for (EventModel channelEvent : channelEvents) {
-					event = channelEvent;
 					InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-					markup.setKeyboard(event.getEventGrid());
+					markup.setKeyboard(channelEvent.getEventGrid());
 					sendMessageRequest.setReplyMarkup(markup);
-					sendMessageRequest.setText(event.getEventText());
+					sendMessageRequest.setText(channelEvent.getEventText());
 					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 					try {
 						sendMessage(sendMessageRequest);

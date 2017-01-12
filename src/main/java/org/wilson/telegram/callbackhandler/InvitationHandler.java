@@ -57,9 +57,9 @@ public class InvitationHandler extends UpdateHandler {
 		}else{
 			
 			//we are editing an event sent from /view
-			String eventName = callBack.getMessage().getText().split("\\r?\\n")[0];
+			String eventId = callBack.getData().split(" ")[1];
 			
-			eventModel = EventFinder.findEventbyName(eventName);
+			eventModel = EventFinder.findEvent(new EventModel(Long.parseLong(eventId)), Cache.getInstance().getMasterEventMap());
 			Long chatId = callBack.getMessage().getChatId();
 			editRequest.setMessageId(callBack.getMessage().getMessageId());
 			editRequest.setChatId(chatId);

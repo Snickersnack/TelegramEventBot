@@ -38,9 +38,7 @@ public class InlineQueryHandler {
 			for(EventModel event : cachedEvents.get(userId)){
 			
 				InputTextMessageContent content = new InputTextMessageContent();
-				content.setMessageText("<a href=\"http://i.imgur.com/GK2OaMx.jpg\">Event</a> " 
-						+  System.getProperty("line.separator")
-						+ event.getEventText());
+				content.setMessageText(event.getEventText());
 				content.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 				content.setDisableWebPagePreview(false);
 				

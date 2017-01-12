@@ -65,11 +65,14 @@ public class Cache {
 					maxId = event.getEventId();
 				}
 				KeyboardBuilder kb = new KeyboardBuilder();
-				event.setEventGrid(kb.buildEventButtons());
+				event.setEventGrid(kb.buildEventButtons(event.getEventId()));
 				Integer userId = event.getEventHost();
+				
+				//"Eager" load these 
 				Hibernate.initialize(event.getTotalResponses());
 				Hibernate.initialize(event.getInLineMessageId());
 				Hibernate.initialize(event.getChannels());
+				
 				//always add the user to the event map (even if we have no events for them)
 				HashSet<EventModel> eventSet = masterEventMap.get(userId);
 				if(eventSet == null){
@@ -81,8 +84,7 @@ public class Cache {
 				//only add to master events if if's already completed
 				if(event.getEventInputStage() == 0){
 					eventSet.add(event);
-					System.out.println("event progress stage: " + event.getEventInputStage() );
-					System.out.println("event name: " + event.getEventName());
+					System.out.println("adding to masterevent name: " + event.getEventName());
 				}
 				//if event stage isn't 0, put this into our inprogress
 				else{
@@ -100,21 +102,24 @@ public class Cache {
 				
 				
 				//add to channel map
-				for(Long channel : event.getChannels()){
-					HashSet<EventModel> channelEvents = channelEventMap.get(channel);
-					if( channelEvents == null){
-						channelEvents = new HashSet<EventModel>();
-						channelEventMap.put(channel, channelEvents);
+				Iterator<Long> it = event.getChannels().iterator();
+				while (it.hasNext()) {
+					Long channel = it.next();					
+					HashSet<EventModel> channelSet = channelEventMap.get(channel);
+					if( channelSet == null){
+						channelSet = new HashSet<EventModel>();
+						channelEventMap.put(channel, channelSet);
 					}
-					channelEvents.add(event);
+					System.out.println("channel cache adding: " + event);
+					channelSet.add(event);
 				}
 				
 				System.out.println("adding event: " + event.getEventId());
 			}
 			globalEventId = maxId+1;
 			
-//			System.out.println("Size of master event map: " + masterEventMap.size());		
-//			System.out.println("Size of channel event map: " + channelEventMap.size());		
+			System.out.println("Size of master event map: " + masterEventMap.size());		
+			System.out.println("Size of channel event map: " + channelEventMap.size());		
 //			System.out.println("Size of inprogress event map: " + inProgressEventCreations.size());		
 //			EventFinder.printAll(163396337);
 //			System.out.println("size of event for me: " + masterEventMap.get(163396337).size());

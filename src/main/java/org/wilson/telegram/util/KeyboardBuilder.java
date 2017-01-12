@@ -36,15 +36,15 @@ public class KeyboardBuilder {
 	
 	
 	
-	public List<List<InlineKeyboardButton>> buildEventButtons(){		
+	public List<List<InlineKeyboardButton>> buildEventButtons(Long eventId){		
 		rows = 1;
 		columns = 2;
 		InlineKeyboardButton button = new InlineKeyboardButton();
 		InlineKeyboardButton button2 = new InlineKeyboardButton();
 		button.setText(EventResponse.ACCEPT);
-		button.setCallbackData(EventResponse.ACCEPT);
+		button.setCallbackData(EventResponse.ACCEPT + " " + eventId);
 		button2.setText(EventResponse.DECLINE);
-		button2.setCallbackData(EventResponse.DECLINE);
+		button2.setCallbackData(EventResponse.DECLINE + " " + eventId);
 		buttons.add(button);
 		buttons.add(button2);
 		return buildKeyboard();

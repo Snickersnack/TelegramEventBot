@@ -39,6 +39,7 @@ public final class CacheUpdater {
 	
 
 	public static void updateChannelEventMap(Message message) {
+		
 		String command = message.getText();
 		String[] arr = command.split("\\r?\\n");
 		String eventName = arr[0];
@@ -46,7 +47,6 @@ public final class CacheUpdater {
 		String eventLocation = arr[2];
 		Integer user = message.getFrom().getId();
 		Long channelId = message.getChatId();
-		EventModel newEvent = new EventModel(eventName, eventDate,eventLocation, user);
 		
 		HashMap<Long, HashSet<EventModel>> channelMap = Cache.getInstance().getChannelEventMap();
 		if(!channelMap.containsKey(channelId)){
@@ -55,15 +55,14 @@ public final class CacheUpdater {
 		HashSet<EventModel> channelSet = channelMap.get(channelId);
 		
 		
-		
-		newEvent = EventFinder.findEventbyName(eventName);
-//		EventPersistence.initialize(newEvent);
+		EventModel newEvent = EventFinder.findEventbyName(eventName, user);
 		Set<Long> channels = newEvent.getChannels();
-		channels.add(channelId);
+		if(channels.add(channelId)){
+			EventPersistence.saveOrUpdate(newEvent);
+		};
 		
-		
-		channelSet.add(newEvent);
-		// is it already in channelMap?
-		// if not find and add to channelMap from userMap (linking events)
+
+		System.out.println("adding to channels:" + channelSet.add(newEvent));
+
 	}
 }

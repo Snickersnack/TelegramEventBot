@@ -185,7 +185,7 @@ public class EventStartCommand {
 
 		
 		KeyboardBuilder eventKeyBoard = new KeyboardBuilder();
-		List<List<InlineKeyboardButton>> newKeyboard = eventKeyBoard.buildEventButtons();
+		List<List<InlineKeyboardButton>> newKeyboard = eventKeyBoard.buildEventButtons(newEvent.getEventId());
 		newEvent.setEventGrid(newKeyboard);
 		String event = EventBuilder.build(newEvent);
 		newEvent.setEventText(event);
