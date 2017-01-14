@@ -34,7 +34,6 @@ public class InlineQueryHandler {
 		//Searches on the userEventMap
 		HashSet<EventModel> userSet = cachedEvents.get(userId);
 		if(userSet!= null && !userSet.isEmpty()){
-			int count = 0;
 			for(EventModel event : cachedEvents.get(userId)){
 			
 				InputTextMessageContent content = new InputTextMessageContent();
@@ -52,18 +51,15 @@ public class InlineQueryHandler {
 				
 				InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 				markup.setKeyboard(event.getEventGrid());
-				if(count%2 == 0){
-					qResultArticle.setThumbUrl("http://i.imgur.com/GK2OaMx.jpg");
-
-				}
-//				qResultArticle.setUrl("http://i.imgur.com/GK2OaMx.jpg");
+				qResultArticle.setThumbUrl(event.getImgur());
+				System.out.println(event.getImgur());
+//				qResultArticle.setUrl("http://i.imgur.com/GK2OaMxs.jpg");
 				qResultArticle.setReplyMarkup(markup);
 				qResultArticle.setInputMessageContent(content);
 				qResultArticle.setId(event.getEventId().toString());
 				qResultArticle.setTitle(event.getEventName());
 				qResultArticle.setHideUrl(false);
 				list.add(qResultArticle);
-			count++;
 			}	
 
 		}

@@ -1,5 +1,6 @@
 package org.wilson.telegram.commandprocesses;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,7 +10,6 @@ import java.util.List;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -88,10 +88,7 @@ public class EventStartCommand {
 		
 
 			if(stage == 1){
-//				EventFinder.printAll(userId);
 				inProgressEventItem.setEventName(message.getText());
-				System.out.println("here's the event name: " + inProgressEventItem.getEventName());
-				//If event already exists, request another input
 				EventModel temp = EventFinder.findEventbyNameUser(inProgressEventItem.getEventName(), userId);
 				if(temp != null){
 					sendMessageRequest.setText("You already have an event with this name. Please try another name");
@@ -110,7 +107,6 @@ public class EventStartCommand {
 					
 					String date = message.getText();
 					String dateInput = message.getText().substring(0,10);
-					System.out.println("dateinput: " + dateInput);
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 					LocalDate eventDate = LocalDate.parse(dateInput, formatter);
 					LocalDateTime currentTime = Cache.getInstance().getCurrentTime();
@@ -140,13 +136,38 @@ public class EventStartCommand {
 			//date is substring(0,10)
 			}else if(stage == 3){
 				inProgressEventItem.setEventLocation(message.getText());
-//				sendMessageRequest.setText("Attach an image to this event or /skip");
-//				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
-//				inProgressEventItem.setEventInputStage(4);
-//
-//				
-//			}else if (stage == 4){
+				sendMessageRequest.setText("Attach an image or sticker to this event or /skip");
+				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+				inProgressEventItem.setEventInputStage(4);
+				EventPersistence.saveOrUpdate(inProgressEventItem);
+
 				
+			}else if (stage == 4){
+				
+				
+				
+				if(message.hasPhoto() || message.getSticker() != null){
+					ImgurHelper imgurHelper = new ImgurHelper(message);
+					String imgurUrl = null;
+					try{
+						imgurUrl = imgurHelper.post();
+
+					}catch(Exception e){
+						e.printStackTrace();
+						sendMessageRequest.setText("<i>There was an issue uploading. Please send again </i>");
+						sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+						return sendMessageRequest;
+					}
+					inProgressEventItem.setImgur(imgurUrl);
+				}
+				else{
+					String command = message.getText();
+					if(!command.equals("/skip")){
+						sendMessageRequest.setText("<i>Please upload a </i><strong>photo</strong> <i>or a</i> <strong>sticker</strong>");
+						sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+						return sendMessageRequest;
+					}
+				}
 				EventModel newEvent = generateNewEvent(message);
 				
 				//Generate a return keyboard button
@@ -189,11 +210,8 @@ public class EventStartCommand {
 		newEvent.setEventGrid(newKeyboard);
 		String event = EventBuilder.build(newEvent);
 		newEvent.setEventText(event);
-		newEvent.setEventHost(userId);
-		newEvent.setEventHostFirst(message.getFrom().getFirstName());
 		
-		System.out.println(mapSet.add(newEvent));
-		System.out.println(mapSet.size());
+		mapSet.add(newEvent);
 
 		return newEvent;
     }

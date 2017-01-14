@@ -22,7 +22,8 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.callbackhandler.CallbackHandler;
-import org.wilson.telegram.callbackhandler.EditTextCallback;
+import org.wilson.telegram.callbackhandler.usercallback.models.EditTextCallback;
+import org.wilson.telegram.commandprocesses.EventStartCommand;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.inlinequeryhandler.InlineQueryHandler;
 import org.wilson.telegram.messagehandler.MessageParser;
@@ -81,22 +82,37 @@ public class UpdateHandler extends TelegramLongPollingBot {
 
 		else if (update.hasCallbackQuery()) {
 			BotApiMethod<?> request = CallbackHandler.parse(update);
-
 			return request;
-
-
 		}
 		else if (update.hasMessage()){
 			Message message = update.getMessage();
-			//if this is an event, check for exact string match of event title
+			Integer userId = message.getFrom().getId();
+			
+			
+			
+			if(message.hasPhoto() || message.getSticker() != null){
+				
+				//Check if this is for a picture edit
+				if(Cache.getInstance().getInProgressEdit().get(userId) != null){
+					
+					return EditPicture.execute(message);
+				//Otherwise this is for an event creation
+				}else{
+					SendMessage sendMessageRequest = EventStartCommand.setEventInfo(message);
+					return sendMessageRequest;
+				}
 
-			MessageParser messageHandler = new MessageParser(message);
-			try {
-				return messageHandler.parse();
+			}else{
+				MessageParser messageHandler = new MessageParser(message);
+				try {
+					return messageHandler.parse();
 
-			} catch (Exception e) {
-				e.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+
+			
 
 		}
 		return null;

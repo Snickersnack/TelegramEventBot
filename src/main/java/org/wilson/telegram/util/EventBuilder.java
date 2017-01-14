@@ -93,6 +93,12 @@ public class EventBuilder {
 		String eventDate = eventModel.getEventDate();
 		String eventHostFirst = eventModel.getEventHostFirst();
 //		EventPersistence.initialize(eventModel);
+		if(eventModel.getImgur()!=null){
+//			"<a href=\"http://i.imgur.com/GK2OaMxm.jpg\">test</a>"
+			eventName = "<a href=\"" + eventModel.getImgur()+ "\">" + eventName + "</a>";
+		}else{
+			eventName = "<strong>" + eventName + "</strong>";
+		}
 
 		Map<String, Boolean> attendees = eventModel.getTotalResponses();
 
@@ -118,7 +124,7 @@ public class EventBuilder {
 		}
 		
 		
-		eventText = "<strong>" + eventName + "</strong>"
+		eventText = eventName 
 				+ System.getProperty("line.separator") + eventDate
 				+ System.getProperty("line.separator") + eventLocation
 				+ System.getProperty("line.separator") + attendeeList;

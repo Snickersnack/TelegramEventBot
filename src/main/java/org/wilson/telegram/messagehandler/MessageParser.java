@@ -1,26 +1,37 @@
 package org.wilson.telegram.messagehandler;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.File;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.PhotoSize;
+import org.telegram.telegrambots.api.objects.Sticker;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.UpdateHandler;
+import org.wilson.telegram.commandprocesses.ImgurHelper;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.messagehandler.usermessage.UserMessageHelper;
+import org.wilson.telegram.models.Data;
 import org.wilson.telegram.templates.Commands;
 import org.wilson.telegram.util.KeyboardBuilder;
+import org.wilson.telegram.util.DateUtil.DateEventCleanup;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Service to parse commands
@@ -51,55 +62,7 @@ public class MessageParser extends UpdateHandler {
 
 	public BotApiMethod<?> parse() throws TelegramApiException {
 
-		
-		if(message.hasPhoto()){
-//			else if(update.getMessage().hasPhoto()){
-//			
-//			List<PhotoSize> imagelist = update.getMessage().getPhoto();
-//			PhotoSize image = imagelist.get(2);
-//			System.out.println("image file path " + image.getFilePath());
-//			System.out.println(image.toString());
-//			GetFile file = new GetFile();
-//			file.setFileId(image.getFileId());
-//			File tFile = getFile(file);
-//			
-//			java.io.File newFile = downloadFile(tFile);
-//			
-//			byte[] imageInByte = null;
-//			BufferedImage img = null;
-//			try {
-//			    img = ImageIO.read(newFile);
-//				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//			    ImageIO.write( img, "jpg", baos );
-//				baos.flush();
-//
-//				imageInByte = baos.toByteArray();
-//				baos.close();
-//				
-//			} catch (IOException e) {
-//				System.out.println(e);
-//			}
-//
-//			SendPhoto mess = new SendPhoto();
-//			System.out.println("file name: " + newFile.getName());
-//			ByteArrayInputStream bInput = new ByteArrayInputStream(imageInByte);
-//			HashSet<EventModel> set = Cache.getInstance().getMasterEventMap().get(163396337);
-//			for(EventModel event : set){
-//				event.setImage(imageInByte);
-//			}
-//			
-//			mess.setNewPhoto("test.png", bInput);
-//			mess.setChatId(update.getMessage().getChatId());
-//			mess.setCaption("👥  (" + "12" + "): ");
-//			KeyboardBuilder build = new KeyboardBuilder();
-//
-//			mess.setReplyMarkup(build.buildReturnMenu());
-//			sendPhoto(mess);
-//			return null;
-//
-//		}
-			return null;
-		}else{
+
 			command = message.getText().toLowerCase();
 			sendMessageRequest.setChatId(message.getChatId());
 			sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
@@ -125,7 +88,7 @@ public class MessageParser extends UpdateHandler {
 					sendMessageRequest.setText("Message @" + BotConfig.BOTUSERNAME + " directly to use this command or click below");
 					KeyboardBuilder keyboard = new KeyboardBuilder(1,1);
 					InlineKeyboardButton button = new InlineKeyboardButton();
-					button.setText("Your Events");
+					button.setText("View your events");
 					button.setSwitchInlineQueryCurrentChat(" ");
 					keyboard.addButton(button);
 					InlineKeyboardMarkup markup = keyboard.buildMarkup();
@@ -151,13 +114,14 @@ public class MessageParser extends UpdateHandler {
 			
 		
 
-
+		
 			return sendMessageRequest;
 
 		}
+	
 	}
 
 
 
 
-}
+

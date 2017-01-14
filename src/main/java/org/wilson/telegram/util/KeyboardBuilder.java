@@ -90,14 +90,30 @@ public class KeyboardBuilder {
 	}
 	
 	public InlineKeyboardMarkup buildEditMenu(String data){
-		rows = 4;
+		Long eventId = Long.parseLong(data);
+		EventModel temp = new EventModel(eventId);
+		EventModel event = EventFinder.findEvent(temp, Cache.getInstance().getMasterEventMap() );
+		String imgur = event.getImgur();
+		String[] editList = {};
+		String[] editButtons = {};
+		if(imgur == null){
+			rows = 4;
+			editList = EventEdit.EDITFIELDLIST;
+			editButtons = EventEdit.EDITBUTTONLIST;
+		}else{
+			rows = 5;
+			editList = EventEdit.EDITFIELDLISTPIC;
+			editButtons = EventEdit.EDITBUTTONLISTPIC;
+		}
 		columns = 1;
 		int counter = 0;
-		for(String editField : EventEdit.EDITFIELDLIST){
+		for(String editField : editList){
 			InlineKeyboardButton button = new InlineKeyboardButton();
-			button.setText(EventEdit.EDITBUTTONLIST[counter]);
+			button.setText(editButtons[counter]);
 			counter++;
 			StringBuilder buttonString = new StringBuilder();
+			buttonString.append(EventEdit.EDITTYPE);
+			buttonString.append(" ");
 			buttonString.append(data);
 			buttonString.append(" ");
 			buttonString.append(editField);

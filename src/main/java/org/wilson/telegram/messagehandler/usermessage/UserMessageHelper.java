@@ -14,6 +14,7 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboar
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.commandprocesses.EventStartCommand;
+import org.wilson.telegram.commandprocesses.ImgurHelper;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.messagehandler.MessageParser;
 import org.wilson.telegram.models.EventModel;
@@ -68,6 +69,7 @@ public class UserMessageHelper extends MessageParser{
 				sendMessageRequest.setText("Return to the /menu");
 				return sendMessageRequest;
 			}else{
+				System.out.println("should reach here");
 				sendMessageRequest = EventStartCommand.setEventInfo(message);
 
 			}

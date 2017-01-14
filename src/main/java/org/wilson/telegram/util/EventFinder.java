@@ -43,7 +43,7 @@ public class EventFinder {
 					}
 				}
 			}else{
-				System.out.println("couldnt find event??");
+				System.out.println("findEvent: couldnt find event");
 				System.out.println("event id: " + newEvent.getEventId());
 			}
 		}

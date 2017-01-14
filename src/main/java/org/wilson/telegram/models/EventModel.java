@@ -40,8 +40,7 @@ public class EventModel {
 	private String eventName;
 	private String eventLocation;
 	private String eventDate;
-	
-	private byte[] image;
+	private String imgur;
 	
 	private Set<Long> channels;
 	
@@ -157,14 +156,15 @@ public class EventModel {
 		return channels;
 	}
 
-	@Transient
-	public byte[] getImage() {
-		return image;
+	@Column(name = "imgur")
+	public String getImgur() {
+		return imgur;
 	}
 
-	public void setImage(byte[] image) {
-		this.image = image;
+	public void setImgur(String imgur) {
+		this.imgur = imgur;
 	}
+
 
 	public void setChannels(Set<Long> channels) {
 		this.channels = channels;
