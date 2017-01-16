@@ -49,7 +49,6 @@ public class EditEventHandler {
 			//UPDATE FOR DEBUGGING: Update{updateId=40098800, message=null, inlineQuery=null, chosenInlineQuery=null, callbackQuery=CallbackQuery{id='701781924027710717', from=User{id=163396337, firstName='Wilson', lastName='Tan', userName='snickersnack'}, message=Message{messageId=1917, from=User{id=258320879, firstName='eveplannerbot', lastName='null', userName='EvePlannerBot'}, date=1482523088, chat=Chat{id=163396337, type='private', title='null', firstName='Wilson', lastName='Tan', userName='snickersnack', allMembersAreAdministrators=null}, forwardFrom=null, forwardFromChat=null, forwardDate=null, text='Edit Events:', entities=null, audio=null, document=null, photo=null, sticker=null, video=null, contact=null, location=null, venue=null, pinnedMessage=null, newChatMember=null, leftChatMember=null, newChatTitle='null', newChatPhoto=null, deleteChatPhoto=null, groupchatCreated=null, replyToMessage=null, voice=null, caption='null', superGroupCreated=null, channelChatCreated=null, migrateToChatId=null, migrateFromChatId=null, editDate=1482523090, game=null, forwardFromMessageId=null}, inlineMessageId='null', data='Edit asdf EditTitle', gameShortName='null', chatInstance='564456924938390008'}, editedMessage=null, channelPost=null, editedChannelPost=null}
 
 			EventModel event = new EventModel(Long.parseLong(dataArray[1]));
-			System.out.println("dataArray 1: " + dataArray[1]);
 			eventModel = EventFinder.findEvent(event, Cache.getInstance().getMasterEventMap());
 			EditModel editModel = new EditModel(messageId, chatId);
 			editModel.setEventModel(eventModel);
@@ -83,7 +82,13 @@ public class EditEventHandler {
 				break;
 				
 			case EventEdit.EDITPICTURE:
-				sb.append("Current picture: " + eventModel.getImgur() );
+				String imgur = eventModel.getImgur();
+				if(imgur == null){
+					sb.append("Current picture: ");
+				}else{
+					sb.append("Current picture: " + imgur );
+
+				}
 				sb.append(System.getProperty("line.separator"));
 				sb.append(System.getProperty("line.separator"));
 				sb.append("Send a new picture or sticker:");
@@ -115,16 +120,20 @@ public class EditEventHandler {
 				sb = new StringBuilder();
 				sb.append(EventEdit.EDITTITLE);
 				sb.append(System.getProperty("line.separator"));
+
 			}
 
 
 		}
 		
-		//build edit Menu
+		//build edit options Menu
 		else{
 			KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
 			String[] dataSplit = data.split(" ");
 			markup = keyboardBuilder.buildEditMenu(dataSplit[1]);
+			EventModel event = new EventModel(Long.parseLong(dataArray[1]));
+			eventModel = EventFinder.findEvent(event, Cache.getInstance().getMasterEventMap());
+			sb.append("<i>" + eventModel.getEventName() + "</i>" );
 	    }
 		sb.append(System.getProperty("line.separator"));
 		editRequest.setReplyMarkup(markup);

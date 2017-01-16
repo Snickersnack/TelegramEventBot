@@ -12,7 +12,6 @@ public class EditTextCallback implements SentCallback<Message> {
 	@Override
 	public void onResult(BotApiMethod<Message> method, Message response) {
 		// TODO Auto-generated method stub
-		System.out.println(response.getText());
 		
 	}
 

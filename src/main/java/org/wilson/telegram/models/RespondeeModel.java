@@ -1,7 +1,9 @@
 package org.wilson.telegram.models;
 
+
 public class RespondeeModel {
 
+	
 	boolean attending;
 	Integer userId;
 	String firstName;
@@ -12,6 +14,7 @@ public class RespondeeModel {
 	public Integer getUserId() {
 		return userId;
 	}
+	
 	public void setAttending(boolean attending) {
 		this.attending = attending;
 	}
@@ -25,6 +28,15 @@ public class RespondeeModel {
 		this.firstName = firstName;
 	}
 	
+	
+	@Override
+	public boolean equals(Object o){
+		if(!(o instanceof RespondeeModel)){
+			return false;
+		}
+		RespondeeModel obj = (RespondeeModel)o;
+		return obj.getUserId().equals(this.userId);
+	}
 	
 	
 }

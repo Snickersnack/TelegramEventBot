@@ -15,8 +15,8 @@ public final class EventEdit {
 	public static final String EVENTLIST = "eventList";
 	public static final String[] EDITFIELDLIST = {EDITNAME,EDITDATE,EDITLOCATION};	
 	public static final String[] EDITFIELDLISTPIC = {EDITNAME,EDITDATE,EDITLOCATION,EDITPICTURE};	
-	public static final String[] EDITBUTTONLIST = {"Event Name" ,"Event Date" ,"Event Location"};	
-	public static final String[] EDITBUTTONLISTPIC = {"Event Name" ,"Event Date" ,"Event Location", "Event Picture"};	
+	public static final String[] EDITBUTTONLIST = {"Edit Name" ,"Edit Date" ,"Edit Location", "Add Picture"};	
+	public static final String[] EDITBUTTONLISTPIC = {"Edit Name" ,"Edit Date" ,"Edit Location", "Edit Picture"};	
 
 
 }

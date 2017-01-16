@@ -1,6 +1,7 @@
 package org.wilson.telegram.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,10 +16,11 @@ import org.wilson.telegram.templates.EventEdit;
 import org.wilson.telegram.templates.EventMenu;
 import org.wilson.telegram.templates.EventRespondees;
 import org.wilson.telegram.templates.EventResponse;
+import org.wilson.telegram.templates.EventView;
 
 public class KeyboardBuilder {
 
-	ArrayList<List<InlineKeyboardButton>> keyboard;
+	List<List<InlineKeyboardButton>> keyboard;
 	List<InlineKeyboardButton> buttons;
 	Integer rows;
 	Integer columns;
@@ -50,7 +52,30 @@ public class KeyboardBuilder {
 		return buildKeyboard();
 	
 	}
-	 
+	
+	
+	//Change way we set rows/columns
+	public InlineKeyboardMarkup buildView(EventModel event){
+		keyboard = buildEventButtons(event.getEventId());
+		
+		
+		rows = 1;
+		columns = 3;
+		buttons = keyboard.get(0);
+		boolean view = event.isShowing();
+		InlineKeyboardButton button = new InlineKeyboardButton();
+		if(view){
+			button.setText(EventView.HIDE);
+			button.setCallbackData(EventView.HIDE + " " + event.getEventId());
+		}else{
+			button.setText(EventView.SHOW);
+			button.setCallbackData(EventView.SHOW + " " + event.getEventId());
+		}
+		buttons.add(button);
+		return buildMarkup();
+	}
+	
+	
 	public InlineKeyboardMarkup buildClearConfirmation(){
 		rows = 1;
 		columns = 2;
@@ -70,7 +95,6 @@ public class KeyboardBuilder {
 		HashSet<EventModel> eventSet = userMap.get(userId);
 		if(eventSet != null && eventSet.size() > 0){
 			Integer eventNumber = eventSet.size();
-			System.out.println("total events for user: " + eventNumber);
 			rows = eventNumber + 1;
 			columns = 1;
 			for(EventModel event : eventSet){
@@ -97,15 +121,13 @@ public class KeyboardBuilder {
 		System.out.println("keyboard builder: " + imgur);
 		String[] editList = {};
 		String[] editButtons = {};
+		editList = EventEdit.EDITFIELDLISTPIC;
 		if(imgur == null){
-			rows = 4;
-			editList = EventEdit.EDITFIELDLIST;
 			editButtons = EventEdit.EDITBUTTONLIST;
 		}else{
-			rows = 5;
-			editList = EventEdit.EDITFIELDLISTPIC;
 			editButtons = EventEdit.EDITBUTTONLISTPIC;
 		}
+		rows = 5;
 		columns = 1;
 		int counter = 0;
 		for(String editField : editList){
@@ -121,6 +143,16 @@ public class KeyboardBuilder {
 			button.setCallbackData(buttonString.toString());
 			addButton(button);
 		}
+		InlineKeyboardButton button = new InlineKeyboardButton();
+		button.setText("<< Back to List");
+		button.setCallbackData(EventEdit.EDITTYPE + " " + EventEdit.EVENTLIST);
+		addButton(button);
+		return buildMarkup();
+	}
+	
+	public InlineKeyboardMarkup buildEditReturnList(){
+		rows = 1;
+		columns = 1;
 		InlineKeyboardButton button = new InlineKeyboardButton();
 		button.setText("<< Back to List");
 		button.setCallbackData(EventEdit.EDITTYPE + " " + EventEdit.EVENTLIST);

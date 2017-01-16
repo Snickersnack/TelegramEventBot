@@ -21,6 +21,7 @@ import org.wilson.telegram.templates.EventResponse;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
 import org.wilson.telegram.util.EventPersistence;
+import org.wilson.telegram.util.KeyboardBuilder;
 
 import persistence.HibernateUtil;
 
@@ -49,9 +50,10 @@ public class InvitationHandler extends UpdateHandler {
 	public EditMessageText handleCallbackQuery() {
 		inLineMessageId = callBack.getInlineMessageId();
 		EditMessageText editRequest = new EditMessageText();
-
+		boolean inline = false;
 		//Set based on existence of inlineMessageId
 		if (inLineMessageId != null) {
+			inline = true;
 			eventModel = EventFinder.findEventByInlineMessageId(inLineMessageId);
 			editRequest.setInlineMessageId(inLineMessageId);
 		}else{
@@ -76,17 +78,30 @@ public class InvitationHandler extends UpdateHandler {
 		String eventText = EventBuilder.build(eventModel);
 		eventModel.setEventText(eventText);
 		
-		
 		InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-		markup.setKeyboard(eventModel.getEventGrid());
+		
+		
+		if(eventModel.getImgur() == null || inline){
+			markup.setKeyboard(eventModel.getEventGrid());
+
+		}else{
+			KeyboardBuilder kb = new KeyboardBuilder();
+			markup = kb.buildView(eventModel);
+			if(eventModel.isShowing()){
+				editRequest.enableWebPagePreview();
+			}else{
+				editRequest.disableWebPagePreview();
+			}
+				
+		}
 	
 		//set edit request
 		editRequest.setParseMode("HTML");
 		editRequest.setText(eventText);
 		editRequest.setReplyMarkup(markup);
+
 		
 		EventPersistence.saveOrUpdate(eventModel);
-//		Cache.getInstance().getPersistenceQueue().add(eventModel.getEventId());
 		sendAnswerFeedBack();
 		return editRequest;
 	}

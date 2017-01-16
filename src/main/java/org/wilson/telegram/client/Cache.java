@@ -29,6 +29,7 @@ public class Cache {
 	private HashMap<Integer, EditModel> inProgressEdit;
 	private HashMap<Long, HashSet<EventModel>> channelEventMap;
 	private HashSet<Long> persistenceQueue; //tabling this until i need it
+	private HashMap<Integer, HashSet<EventModel>> userRespondeeMap; //map for users that have responded
 	private Long globalEventId;
 	private LocalDateTime currentTime;
 
@@ -84,7 +85,6 @@ public class Cache {
 				//only add to master events if if's already completed
 				if(event.getEventInputStage() == 0){
 					eventSet.add(event);
-					System.out.println("adding to masterevent name: " + event.getEventName());
 				}
 				//if event stage isn't 0, put this into our inprogress
 				else{
@@ -110,11 +110,9 @@ public class Cache {
 						channelSet = new HashSet<EventModel>();
 						channelEventMap.put(channel, channelSet);
 					}
-					System.out.println("channel cache adding: " + event);
 					channelSet.add(event);
 				}
 				
-				System.out.println("adding event: " + event.getEventId());
 			}
 			globalEventId = maxId+1;
 			

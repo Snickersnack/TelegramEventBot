@@ -28,9 +28,7 @@ public class EditPicture {
 		
 		String imgurUrl = null;
 		
-		System.out.println("executing edit");
 		if(!message.hasPhoto() && message.getSticker() == null){
-			System.out.println("both null");
 			sendMessageRequest.setText("<i>Please upload a </i><strong>photo</strong> <i>or a</i> <strong>sticker</strong>");
 			return sendMessageRequest;
 		}

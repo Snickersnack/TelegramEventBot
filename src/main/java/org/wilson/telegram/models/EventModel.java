@@ -41,15 +41,16 @@ public class EventModel {
 	private String eventLocation;
 	private String eventDate;
 	private String imgur;
-	
+	boolean showing;
 	private Set<Long> channels;
 	
-
+//	private Set<RespondeeModel> totalResponses;
 	private Map<String, Boolean> totalResponses;
 	
 	private Set<String> inLineMessageIds;
 	
 	public EventModel(){
+		showing = false;
 		eventText = null;
 		eventGrid = new ArrayList<List<InlineKeyboardButton>>();
 		eventHost = null;
@@ -154,6 +155,15 @@ public class EventModel {
 
 	public Set<Long> getChannels() {
 		return channels;
+	}
+
+	@Transient
+	public boolean isShowing() {
+		return showing;
+	}
+
+	public void setShowing(boolean view) {
+		this.showing = view;
 	}
 
 	@Column(name = "imgur")

@@ -92,23 +92,6 @@ public class EditMessageHelper {
 		sb.append(System.getProperty("line.separator"));
 		sendMessageRequest.setText(sb.toString());
 		
-//		KeyboardBuilder keyboardBuilder = new KeyboardBuilder(4,1);
-//		int count = 0;
-//		for(String editField : EventEdit.EDITFIELDLIST){
-//			InlineKeyboardButton button = new InlineKeyboardButton();
-//			button.setText(EventEdit.EDITBUTTONLIST[count]);
-//			count++;
-//			StringBuilder buttonString = new StringBuilder();
-//			buttonString.append(EventEdit.EDITTYPE + " " + event.getEventId());
-//			buttonString.append(" ");
-//			buttonString.append(editField);
-//			button.setCallbackData(buttonString.toString());
-//			keyboardBuilder.addButton(button);
-//		}
-//		InlineKeyboardButton button = new InlineKeyboardButton();
-//		button.setText("<< Back to List");
-//		button.setCallbackData(EventEdit.EDITTYPE + " " + EventEdit.EVENTLIST);
-//		keyboardBuilder.addButton(button);
 		
 		KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
 		

@@ -1,7 +1,9 @@
 package org.wilson.telegram.messagehandler;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.PriorityQueue;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
@@ -11,7 +13,9 @@ import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.templates.Commands;
+import org.wilson.telegram.templates.EventView;
 import org.wilson.telegram.util.CacheUpdater;
+import org.wilson.telegram.util.KeyboardBuilder;
 
 public class GroupMessageHelper extends MessageParser{
 	
@@ -50,26 +54,63 @@ public class GroupMessageHelper extends MessageParser{
 		HashMap<Long, HashSet<EventModel>> channelMap = Cache.getInstance().getChannelEventMap();
 		boolean shared = false;
 		HashSet<EventModel> channelEvents = channelMap.get(channelId);
+		PriorityQueue<EventModel> pQueue = new PriorityQueue<EventModel>(new EventComparator());
 		
 		if (channelEvents != null) {
 			if (channelEvents.size() != 0) {
 				shared = true;
-				for (EventModel channelEvent : channelEvents) {
+				pQueue.addAll(channelEvents);
+				int maxEvents = BotConfig.MAX_CHANNEL_VIEW;
+				sendMessageRequest.setText(EventView.TITLE);
+				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+				try {
+					sendMessage(sendMessageRequest);
+				} catch (TelegramApiException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				while(maxEvents>0){
+					EventModel channelEvent = pQueue.poll();
 					InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-					markup.setKeyboard(channelEvent.getEventGrid());
+					channelEvent.setShowing(false);
+					if(channelEvent.getImgur() == null){
+						markup.setKeyboard(channelEvent.getEventGrid());
+					}else{
+						KeyboardBuilder kb = new KeyboardBuilder();
+						markup = kb.buildView(channelEvent);
+					}
 					sendMessageRequest.setReplyMarkup(markup);
 					sendMessageRequest.setText(channelEvent.getEventText());
 					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+					sendMessageRequest.disableWebPagePreview();
 					try {
 						sendMessage(sendMessageRequest);
 					} catch (TelegramApiException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					maxEvents--;
 				}
 			}
 		}
-//		sendMessageRequest = new SendMessage();
-		return shared;
+			
+
+			return shared;
 	}
+	
+	public class EventComparator implements Comparator<EventModel>{
+		@Override
+	    public int compare(EventModel x, EventModel y)
+	    {
+			if(x.getTotalResponses().size() > y.getTotalResponses().size()){
+			return -1;
+			}
+			if(x.getTotalResponses().size() < y.getTotalResponses().size()){
+			return 1;
+			}
+			
+			return 0;
+	    	}
+	    }
+	
 }

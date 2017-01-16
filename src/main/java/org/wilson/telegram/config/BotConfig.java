@@ -19,6 +19,7 @@ public class BotConfig {
     public static final String TIME_ZONE = "America/Los_Angeles";
     public static final Long SCHEDULED_REMOVAL_DAYS = 2L;
     public static final Integer MAX_EVENTS = 5;
+    public static final Integer MAX_CHANNEL_VIEW = 3;
     
 
     

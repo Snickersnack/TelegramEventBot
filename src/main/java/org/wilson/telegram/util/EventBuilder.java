@@ -119,7 +119,7 @@ public class EventBuilder {
 		String attendeeList = "👥  (" + attendeeSize + "): ";
 		
 		if(attendeeSize == 0){
-			attendeeList = attendeeList + "<i>No one has responded yet</i>";
+			attendeeList = attendeeList + "<i>No one has responded</i>";
 		}else{
 			attendeeList = attendeeList + ab.toString().substring(0, ab.length() - 1);
 		}

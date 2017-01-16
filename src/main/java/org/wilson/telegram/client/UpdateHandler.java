@@ -147,7 +147,7 @@ public class UpdateHandler extends TelegramLongPollingBot {
 		} else if(msg instanceof EditMessageText){
 			EditTextCallback cb = new EditTextCallback();
 			EditMessageText test = (EditMessageText)msg;
-			System.out.println("Outgoing edit message: " + msg);
+//			System.out.println("Outgoing edit message: " + msg);
 			editMessageTextAsync(test, cb);
 		}
 		
