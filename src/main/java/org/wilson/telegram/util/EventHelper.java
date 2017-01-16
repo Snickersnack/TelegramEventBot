@@ -1,15 +1,23 @@
 package org.wilson.telegram.util;
 
 import org.wilson.telegram.client.Cache;
+import org.wilson.telegram.models.EditModel;
+import org.wilson.telegram.models.EventModel;
 
 public class EventHelper {
 
-	public static void clearInprogress(Integer userId){
-		if(Cache.getInstance().getInProgressEdit().get(userId) != null){
-			Cache.getInstance().getInProgressEdit().put(userId, null);
+	public static void clearInProgress(Integer userId){
+		EventModel inProgressEvent = Cache.getInstance().getInProgressEventCreations().get(userId);
+		if( inProgressEvent != null){
+			EventPersistence.delete(inProgressEvent);
+			inProgressEvent = null;
+			Cache.getInstance().getInProgressEventCreations().put(userId, inProgressEvent);
 		}
-		if(Cache.getInstance().getInProgressEventCreations().get(userId) != null){
-			Cache.getInstance().getInProgressEventCreations().put(userId, null);
+		
+		EditModel inProgressEdit = Cache.getInstance().getInProgressEdit().get(userId);
+		if( inProgressEdit != null){
+			inProgressEdit = null;
+			Cache.getInstance().getInProgressEdit().put(userId, inProgressEdit);
 		}
 	}
 }

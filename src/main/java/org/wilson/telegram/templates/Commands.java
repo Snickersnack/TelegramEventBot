@@ -21,6 +21,8 @@ public final class Commands {
     public static final String EDITCOMMAND = INIT_CHAR + "edit";
     public static final String CANCELCOMMAND = INIT_CHAR + "cancel";
     public static final String RESPONDEESCOMMAND = INIT_CHAR + "respondees";
+    public static final String SKIPCOMMAND = INIT_CHAR + "skip";
+
     
     public static final String HELPTEXT =  "Begin typing @" + BotConfig.BOTUSERNAME + " to start a new event"
     		+ System.getProperty("line.separator")

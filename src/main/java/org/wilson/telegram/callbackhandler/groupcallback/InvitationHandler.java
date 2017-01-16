@@ -1,4 +1,4 @@
-package org.wilson.telegram.callbackhandler;
+package org.wilson.telegram.callbackhandler.groupcallback;
 
 import java.util.HashMap;
 import java.util.HashSet;

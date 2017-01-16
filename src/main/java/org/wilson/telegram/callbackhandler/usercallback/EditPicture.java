@@ -1,10 +1,11 @@
-package org.wilson.telegram.client;
+package org.wilson.telegram.callbackhandler.usercallback;
 
 import java.util.HashMap;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.commandprocesses.ImgurHelper;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EditModel;
@@ -24,7 +25,16 @@ public class EditPicture {
 		SendMessage sendMessageRequest = new SendMessage();
 		sendMessageRequest.setChatId(message.getChatId());
 		sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+		
 		String imgurUrl = null;
+		
+		System.out.println("executing edit");
+		if(!message.hasPhoto() && message.getSticker() == null){
+			System.out.println("both null");
+			sendMessageRequest.setText("<i>Please upload a </i><strong>photo</strong> <i>or a</i> <strong>sticker</strong>");
+			return sendMessageRequest;
+		}
+		
 		try{
 			imgurUrl = imgur.post();
 

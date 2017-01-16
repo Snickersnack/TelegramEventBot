@@ -1,6 +1,5 @@
 package org.wilson.telegram.commandprocesses;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +15,8 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboar
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.templates.Commands;
+import org.wilson.telegram.templates.EventCreation;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
 import org.wilson.telegram.util.EventPersistence;
@@ -91,13 +92,11 @@ public class EventStartCommand {
 				inProgressEventItem.setEventName(message.getText());
 				EventModel temp = EventFinder.findEventbyNameUser(inProgressEventItem.getEventName(), userId);
 				if(temp != null){
-					sendMessageRequest.setText("You already have an event with this name. Please try another name");
-				}else{
-					sendMessageRequest.setText("What is the date of this event?"
-							+ System.getProperty("line.separator")
-							+ System.getProperty("line.separator")
+					sendMessageRequest.setText(EventCreation.DUPLICATE);
+					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
 
-							+ "<i>Use month/date format (e.g. 01/21/2018 10:00PM)</i>");
+				}else{
+					sendMessageRequest.setText(EventCreation.DATE);
 					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
 					inProgressEventItem.setEventInputStage(2);
 					EventPersistence.update(inProgressEventItem);
@@ -111,13 +110,19 @@ public class EventStartCommand {
 					LocalDate eventDate = LocalDate.parse(dateInput, formatter);
 					LocalDateTime currentTime = Cache.getInstance().getCurrentTime();
 					LocalDate currentDay = currentTime.toLocalDate();
+					String currentDayStr = currentDay.format(formatter);
+					
 					if(eventDate.isBefore(currentDay)){
-						sendMessageRequest.setText("Date cannot be before today");
+						
+						sendMessageRequest.setText(EventCreation.DATEBEFOREERROR +" : " + currentDayStr);
+						sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
+
 						return sendMessageRequest;
 					}
 
 					inProgressEventItem.setEventDate(date);
-					sendMessageRequest.setText("Where is the location of this event?");
+					sendMessageRequest.setText(EventCreation.LOCATION);
+					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 					inProgressEventItem.setEventInputStage(3);
 					EventPersistence.update(inProgressEventItem);
 
@@ -125,8 +130,8 @@ public class EventStartCommand {
 
 
 				}catch(Exception e){
-					System.out.println(e);
-					sendMessageRequest.setText("<i>Please specify the date in the correct format</i> <strong>(e.g. 01/21/2018)</strong>");
+					e.printStackTrace();
+					sendMessageRequest.setText(EventCreation.DATEERROR);
 					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);	
 					return sendMessageRequest;
 				}
@@ -136,7 +141,7 @@ public class EventStartCommand {
 			//date is substring(0,10)
 			}else if(stage == 3){
 				inProgressEventItem.setEventLocation(message.getText());
-				sendMessageRequest.setText("Attach an image or sticker to this event or /skip");
+				sendMessageRequest.setText(EventCreation.STICKER);
 				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 				inProgressEventItem.setEventInputStage(4);
 				EventPersistence.saveOrUpdate(inProgressEventItem);
@@ -154,16 +159,16 @@ public class EventStartCommand {
 
 					}catch(Exception e){
 						e.printStackTrace();
-						sendMessageRequest.setText("<i>There was an issue uploading. Please send again </i>");
+						sendMessageRequest.setText(EventCreation.UPLOADERROR);
 						sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 						return sendMessageRequest;
 					}
 					inProgressEventItem.setImgur(imgurUrl);
 				}
 				else{
-					String command = message.getText();
-					if(!command.equals("/skip")){
-						sendMessageRequest.setText("<i>Please upload a </i><strong>photo</strong> <i>or a</i> <strong>sticker</strong>");
+					String command = message.getText().toLowerCase();
+					if(!command.equals(Commands.SKIPCOMMAND)){
+						sendMessageRequest.setText(EventCreation.STICKERERROR);
 						sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 						return sendMessageRequest;
 					}

@@ -61,8 +61,11 @@ public class UserCallback {
 		else if(callbackType.equals(EventRespondees.TYPE)){
 			HashSet<EventModel> set = Cache.getInstance().getMasterEventMap().get(userId);
 			if( set == null || set.size() == 0){
-				
-				editMessageRequest.setText(EventRespondees.NOEVENTS);
+				String text = EventRespondees.TITLE
+						+System.getProperty("line.separator")
+						+System.getProperty("line.separator")
+						+EventRespondees.NOEVENTS;
+				editMessageRequest.setText(text);
 				editMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 				InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 				KeyboardBuilder keyboardBuilder = new KeyboardBuilder();

@@ -94,6 +94,7 @@ public class KeyboardBuilder {
 		EventModel temp = new EventModel(eventId);
 		EventModel event = EventFinder.findEvent(temp, Cache.getInstance().getMasterEventMap() );
 		String imgur = event.getImgur();
+		System.out.println("keyboard builder: " + imgur);
 		String[] editList = {};
 		String[] editButtons = {};
 		if(imgur == null){

@@ -23,7 +23,9 @@ import org.wilson.telegram.templates.EventClear;
 import org.wilson.telegram.templates.EventDelete;
 import org.wilson.telegram.templates.EventEdit;
 import org.wilson.telegram.templates.EventMenu;
+import org.wilson.telegram.templates.EventRespondees;
 import org.wilson.telegram.util.EventBuilder;
+import org.wilson.telegram.util.EventHelper;
 import org.wilson.telegram.util.EventPersistence;
 import org.wilson.telegram.util.KeyboardBuilder;
 import org.wilson.telegram.util.RespondeesCommand;
@@ -54,25 +56,29 @@ public class UserMessageHelper extends MessageParser{
 			return EventStartCommand.start(user, chatId);
 		}
 
-		else if (inProgressEvent != null) {
+	    if (inProgressEvent != null) {
+    		//We always clear in progress things if it's not view
+	    	
+	    	if(command.startsWith(Commands.INIT_CHAR) && !command.startsWith(Commands.VIEWCOMMAND) && !command.startsWith(Commands.SKIPCOMMAND)){
+	    		EventHelper.clearInProgress(userId);
+	    		inProgressEvent = null;
+			    if(command.startsWith(Commands.CANCELCOMMAND)){
+					KeyboardBuilder keyboardBuilder = new KeyboardBuilder(1,1);
+					InlineKeyboardButton button = new InlineKeyboardButton();
+					button.setText("Return to a channel");
+					button.setSwitchInlineQuery(" ");
+					keyboardBuilder.addButton(button);
+					InlineKeyboardMarkup markup = keyboardBuilder.buildMarkup();
+					sendMessageRequest.setReplyMarkup(markup);
+					sendMessageRequest.setText("Return to the /menu");
+					return sendMessageRequest;
+				}
+	    	}
+	    }
 
-		    if(command.startsWith(Commands.CANCELCOMMAND)){
-		    	EventPersistence.delete(inProgressEvent);
-				inProgressCache.put(userId, null);
-				KeyboardBuilder keyboardBuilder = new KeyboardBuilder(1,1);
-				InlineKeyboardButton button = new InlineKeyboardButton();
-				button.setText("Return to a channel");
-				button.setSwitchInlineQuery(" ");
-				keyboardBuilder.addButton(button);
-				InlineKeyboardMarkup markup = keyboardBuilder.buildMarkup();
-				sendMessageRequest.setReplyMarkup(markup);
-				sendMessageRequest.setText("Return to the /menu");
-				return sendMessageRequest;
-			}else{
-				System.out.println("should reach here");
+	    if (inProgressEvent != null) {
 				sendMessageRequest = EventStartCommand.setEventInfo(message);
-
-			}
+			    
 		}
 		
 
@@ -100,7 +106,10 @@ public class UserMessageHelper extends MessageParser{
 		else if(command.startsWith(Commands.VIEWCOMMAND)){
 			boolean eventsSent = sendViewCommand(userId);
 			if (!eventsSent) {
-				sendMessageRequest.setText("You currently have no events!");
+				sendMessageRequest.setText("You haven't responded to any events!");
+				KeyboardBuilder kb = new KeyboardBuilder();
+				InlineKeyboardMarkup markup = kb.buildReturnMenu();
+				sendMessageRequest.setReplyMarkup(markup);
 			} else {
 				return null;
 			}
@@ -118,6 +127,9 @@ public class UserMessageHelper extends MessageParser{
 				sendMessageRequest = EventBuilder.listAllEvents(userId, sendMessageRequest, EventEdit.EDITTYPE, sb);			
 			}else{
 				sendMessageRequest.setText("<i>You currently have no events</i>");
+				KeyboardBuilder kb = new KeyboardBuilder();
+				InlineKeyboardMarkup markup = kb.buildReturnMenu();
+				sendMessageRequest.setReplyMarkup(markup);
 			}
 			
 			sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
@@ -135,9 +147,12 @@ public class UserMessageHelper extends MessageParser{
 					sendMessageRequest = EventBuilder.listAllEvents(userId, sendMessageRequest, EventDelete.DELETETYPE, sb);	
 				}else{
 					sendMessageRequest.setText("<i>You currently have no events</i>");
+					KeyboardBuilder kb = new KeyboardBuilder();
+					InlineKeyboardMarkup markup = kb.buildReturnMenu();
+					sendMessageRequest.setReplyMarkup(markup);
 				}
 				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
-				
+
 				return sendMessageRequest;
 			
 

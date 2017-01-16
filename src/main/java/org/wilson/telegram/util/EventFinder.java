@@ -39,12 +39,10 @@ public class EventFinder {
 				for (EventModel eventItem : set) {
 					if (eventItem.equals(newEvent)) {
 						newEvent = eventItem;
+						System.out.println("found event: " + newEvent);
 						return newEvent;
 					}
 				}
-			}else{
-				System.out.println("findEvent: couldnt find event");
-				System.out.println("event id: " + newEvent.getEventId());
 			}
 		}
 		return null;

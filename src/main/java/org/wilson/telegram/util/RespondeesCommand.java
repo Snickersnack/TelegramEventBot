@@ -26,7 +26,6 @@ public class RespondeesCommand extends UpdateHandler {
 		sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 		try {
 			sendMessage(sendMessageRequest);
-			System.out.println("sent");
 		} catch (TelegramApiException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -70,14 +69,14 @@ public class RespondeesCommand extends UpdateHandler {
 					sb.append("<i>No one has responded yet</i>");
 				} else {
 					if (accept.length() > 1 && reject.length() == 0) {
-						sb.append("☑️"
+						sb.append("✔️"
 								+ accept.toString().substring(0,accept.length() - 1) );
 					} else if (accept.length() == 0 && reject.length() > 1) {
 						sb.append(  "✖️ " + reject.toString().substring(0,
 								reject.length() - 1));
 
 					} else {
-						sb.append("☑️"
+						sb.append("✔️"
 								 +accept.toString().substring(0,accept.length() - 1)
 								 + 	System.getProperty("line.separator")
 								+ "✖️" + reject.toString().substring(0,
@@ -97,6 +96,26 @@ public class RespondeesCommand extends UpdateHandler {
 			}
 
 		}
+		
+		//We have no events
+		else{
+			sendMessageRequest.setText("You currently have no events");
+		}
+		KeyboardBuilder keyboardBuilder = new KeyboardBuilder(1, 1);
+		InlineKeyboardButton button = new InlineKeyboardButton();
+		button.setCallbackData(EventMenu.MENUDATA + " " + EventMenu.MENUSEND);
+		button.setText(EventMenu.MENUTEXT);
+		keyboardBuilder.addButton(button);
+		InlineKeyboardMarkup markup = keyboardBuilder.buildMarkup();
+//		sendMessageRequest.setReplyMarkup(markup);
+//		sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+//		sendMessageRequest.setChatId(chatId);
+//		try {
+//			sendMessage(sendMessageRequest);
+//		} catch (TelegramApiException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	public EditMessageText buildEdit(Integer userId, EditMessageText editRequest) {
@@ -139,14 +158,14 @@ public class RespondeesCommand extends UpdateHandler {
 					sb.append("<i>No one has responded yet</i>");
 				} else {
 					if (accept.length() > 1 && reject.length() == 0) {
-						sb.append("☑️ "
+						sb.append("✔️ "
 								+ accept.toString().substring(0,accept.length() - 1) );
 					} else if (accept.length() == 0 && reject.length() > 1) {
 						sb.append(  "✖️  " + reject.toString().substring(0,
 								reject.length() - 1));
 
 					} else {
-						sb.append("☑️ "
+						sb.append("✔️️ "
 								 +accept.toString().substring(0,accept.length() - 1)
 								 + 	System.getProperty("line.separator")
 								+ "✖️  " + reject.toString().substring(0,

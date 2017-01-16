@@ -1,4 +1,4 @@
-package org.wilson.telegram.callbackhandler.usercallback.models;
+package org.wilson.telegram.models;
 
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.objects.Message;

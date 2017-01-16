@@ -36,6 +36,7 @@ public class EventBuilder {
 		KeyboardBuilder keyboardBuilder = new KeyboardBuilder();
 		InlineKeyboardMarkup markup = keyboardBuilder.buildEventsList(userId, type);
 		sendMessageRequest.setReplyMarkup(markup);
+		System.out.println("event builder list all events markup: " + markup);
 		if(type.equals(EventEdit.EDITTYPE)){
 			sendMessageRequest.setText(EventEdit.EDITTITLE
 					+ System.getProperty("line.separator")

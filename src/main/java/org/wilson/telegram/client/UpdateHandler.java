@@ -22,11 +22,12 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.callbackhandler.CallbackHandler;
-import org.wilson.telegram.callbackhandler.usercallback.models.EditTextCallback;
+import org.wilson.telegram.callbackhandler.usercallback.EditPicture;
 import org.wilson.telegram.commandprocesses.EventStartCommand;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.inlinequeryhandler.InlineQueryHandler;
 import org.wilson.telegram.messagehandler.MessageParser;
+import org.wilson.telegram.models.EditTextCallback;
 import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.util.CacheUpdater;
 import org.wilson.telegram.util.KeyboardBuilder;
@@ -81,7 +82,8 @@ public class UpdateHandler extends TelegramLongPollingBot {
 		}
 
 		else if (update.hasCallbackQuery()) {
-			BotApiMethod<?> request = CallbackHandler.parse(update);
+			CallbackHandler cbHandler = new CallbackHandler();
+			BotApiMethod<?> request = cbHandler.parse(update);
 			return request;
 		}
 		else if (update.hasMessage()){
@@ -93,13 +95,18 @@ public class UpdateHandler extends TelegramLongPollingBot {
 			if(message.hasPhoto() || message.getSticker() != null){
 				
 				//Check if this is for a picture edit
+				//Currently no handling for if they are sending an emoji instead of a sticker
 				if(Cache.getInstance().getInProgressEdit().get(userId) != null){
 					
 					return EditPicture.execute(message);
-				//Otherwise this is for an event creation
+				
+					//Otherwise this is for an event creation
 				}else{
-					SendMessage sendMessageRequest = EventStartCommand.setEventInfo(message);
-					return sendMessageRequest;
+					if(Cache.getInstance().getInProgressEventCreations().get(userId) !=null){
+						SendMessage sendMessageRequest = EventStartCommand.setEventInfo(message);
+						return sendMessageRequest;
+					}
+					
 				}
 
 			}else{

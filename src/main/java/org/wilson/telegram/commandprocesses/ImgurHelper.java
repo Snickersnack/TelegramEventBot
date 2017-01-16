@@ -12,13 +12,16 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.telegram.telegrambots.api.methods.GetFile;
+import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.File;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.Sticker;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.messagehandler.MessageParser;
 import org.wilson.telegram.models.ResponseModel;
+import org.wilson.telegram.templates.EventRespondees;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -27,9 +30,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ImgurHelper extends MessageParser {
 
 	Message message;
+	Long chatId;
 
 	public ImgurHelper(Message message) {
 		this.message = message;
+		this.chatId = message.getChatId();
 	}
 
 	public static String uploadImage(String input) throws IOException {
@@ -75,8 +80,20 @@ public class ImgurHelper extends MessageParser {
 	}
 
 	//add handling for when image doesn't uploda
-	public static String upload(String telegramurl) throws Exception {
-		System.out.println("upload via telegram url");
+	public String upload(String telegramurl) throws Exception {
+		SendMessage sendMessageRequest = new SendMessage();
+		sendMessageRequest.setChatId(chatId);
+		sendMessageRequest.setText("<i>Uploading...</i>");
+		sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+		try {
+			sendMessage(sendMessageRequest);
+		} catch (TelegramApiException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
 		URL url;
 		HttpsURLConnection conn;
 		
