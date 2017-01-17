@@ -26,11 +26,22 @@ public final class Commands {
     
     public static final String HELPTEXT =  "Begin typing @" + BotConfig.BOTUSERNAME + " to start a new event"
     		+ System.getProperty("line.separator")
-    		+ System.getProperty("line.separator") + "Share events across channels. Events shared to channels that have this bot will be added to the /view command"
+    		+ System.getProperty("line.separator") + "Once you're done, share the event to a channel from the list. You will be able to see everyone who responded by using /menu in a direct message chat with @" + BotConfig.BOTUSERNAME 
     		+ System.getProperty("line.separator")
-    		+ System.getProperty("line.separator") + "Use /view to see all events shared to this channel"
+    		+ System.getProperty("line.separator") + "Use /view in a channel to see all events that have been shared to that channel. Use /view in a private chat to see all events that you have accepted or declined"
     		+ System.getProperty("line.separator")
-			+ System.getProperty("line.separator") + "Message /menu to @" + BotConfig.BOTUSERNAME + " to manage your events and see who's responded"
+			+ System.getProperty("line.separator") + "List of shortcuts in private chat:"
+			+ System.getProperty("line.separator")
+			+ STARTCOMMAND
+			+ System.getProperty("line.separator")
+			+ RESPONDEESCOMMAND
+			+ System.getProperty("line.separator")
+			+ DELETEEVENTSCOMMAND
+			+ System.getProperty("line.separator")
+			+ CLEAREVENTSCOMMAND
+			+ System.getProperty("line.separator")
+			+ EDITCOMMAND
 			+ System.getProperty("line.separator");
+
 
 }
