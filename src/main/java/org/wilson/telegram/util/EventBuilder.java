@@ -2,20 +2,17 @@ package org.wilson.telegram.util;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.models.RespondeeModel;
 import org.wilson.telegram.templates.EventDelete;
 import org.wilson.telegram.templates.EventEdit;
-
-import persistence.HibernateUtil;
 
 public class EventBuilder {
 	
@@ -93,25 +90,29 @@ public class EventBuilder {
 		String eventLocation = eventModel.getEventLocation();
 		String eventDate = eventModel.getEventDate();
 		String eventHostFirst = eventModel.getEventHostFirst();
-//		EventPersistence.initialize(eventModel);
 		if(eventModel.getImgur()!=null){
-//			"<a href=\"http://i.imgur.com/GK2OaMxm.jpg\">test</a>"
 			eventName = "<a href=\"" + eventModel.getImgur()+ "\">" + eventName + "</a>";
 		}else{
 			eventName = "<strong>" + eventName + "</strong>";
 		}
 
-		Map<String, Boolean> attendees = eventModel.getTotalResponses();
-
+//		Map<String, Boolean> attendees = eventModel.getTotalResponses();
+		Set<RespondeeModel> attendees = eventModel.getTotalResponses();
 		
 
 
 		StringBuilder ab = new StringBuilder();
 		Integer attendeeSize = 0;
 		if (!attendees.isEmpty()) {
-			for (Entry<String, Boolean> item : attendees.entrySet()) {	
-				if(item.getValue()){
-						ab.append(" " + item.getKey() + ",");
+//			for (Entry<String, Boolean> item : attendees.entrySet()) {	
+//				if(item.getValue()){
+//						ab.append(" " + item.getKey() + ",");
+//						attendeeSize++;
+//				}
+			
+			for (RespondeeModel item : attendees) {	
+				if(item.isAttending()){
+						ab.append(" " + item.getFirstName() + ",");
 						attendeeSize++;
 				}
 			}

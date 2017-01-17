@@ -195,17 +195,32 @@ public class UserMessageHelper extends MessageParser{
 	}
 	
 	private boolean sendViewCommand(Integer userId) {
-		HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getMasterEventMap();
+		HashMap<Integer, HashSet<EventModel>> userMap = Cache.getInstance().getUserRespondeeMap();
 		boolean shared = false;
 		HashSet<EventModel> userEvents = userMap.get(userId);
 		
 		if (userEvents != null) {
 			if (userEvents.size() != 0) {
+				sendMessageRequest.setText("Here's a list of events you have been invited (and have responded) to:");
+				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
+				try {
+					sendMessage(sendMessageRequest);
+				} catch (TelegramApiException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				shared = true;
 				for (EventModel event : userEvents) {
+					KeyboardBuilder kb = new KeyboardBuilder();
 					InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-					markup.setKeyboard(event.getEventGrid());
-					sendMessageRequest.setReplyMarkup(markup);
+					if(event.getImgur() == null){
+						markup.setKeyboard(event.getEventGrid());
+						sendMessageRequest.setReplyMarkup(markup);
+					}else{
+						sendMessageRequest.setReplyMarkup(kb.buildView(event));
+
+					}
+					sendMessageRequest.disableWebPagePreview();
 					sendMessageRequest.setText(event.getEventText());
 					sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 					try {

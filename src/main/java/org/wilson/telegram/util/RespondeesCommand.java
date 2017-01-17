@@ -13,6 +13,7 @@ import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.client.UpdateHandler;
 import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.models.RespondeeModel;
 import org.wilson.telegram.templates.EventMenu;
 import org.wilson.telegram.templates.EventRespondees;
 
@@ -49,11 +50,11 @@ public class RespondeesCommand extends UpdateHandler {
 
 				int count = 1;
 				
-				for (Entry<String, Boolean> entry : event.getTotalResponses()
-						.entrySet()) {
+//				for (Entry<String, Boolean> entry : event.getTotalResponses().entrySet()) {
+				for (RespondeeModel entry : event.getTotalResponses()) {
 
-					Boolean attend = entry.getValue();
-					String person = entry.getKey();
+					Boolean attend = entry.isAttending();
+					String person = entry.getFirstName();
 					if (attend) {
 						accept.append(" " + person);
 						accept.append(",");
@@ -138,11 +139,10 @@ public class RespondeesCommand extends UpdateHandler {
 				sb.append(System.getProperty("line.separator"));
 
 				int count = 1;
-				for (Entry<String, Boolean> entry : event.getTotalResponses()
-						.entrySet()) {
+				for (RespondeeModel entry : event.getTotalResponses()) {
 
-					Boolean attend = entry.getValue();
-					String person = entry.getKey();
+					Boolean attend = entry.isAttending();
+					String person = entry.getFirstName();
 					if (attend) {
 						accept.append(person);
 						accept.append(",");

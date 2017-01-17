@@ -12,7 +12,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.wilson.telegram.models.EditModel;
 import org.wilson.telegram.models.EventModel;
-import org.wilson.telegram.util.EventFinder;
+import org.wilson.telegram.models.RespondeeModel;
 import org.wilson.telegram.util.KeyboardBuilder;
 
 import persistence.HibernateUtil;
@@ -30,7 +30,10 @@ public class Cache {
 	private HashMap<Long, HashSet<EventModel>> channelEventMap;
 	private HashSet<Long> persistenceQueue; //tabling this until i need it
 	private HashMap<Integer, HashSet<EventModel>> userRespondeeMap; //map for users that have responded
+
+
 	private Long globalEventId;
+	private Long globalResponseId; //for persistence
 	private LocalDateTime currentTime;
 
 	
@@ -41,6 +44,7 @@ public class Cache {
 		setChannelEventMap(new HashMap<Long, HashSet<EventModel>>() );
 		setInProgressEventCreations(new HashMap<Integer, EventModel>());
 		setInProgressEdit(new HashMap<Integer, EditModel>());
+		setUserRespondeeMap(new HashMap<Integer, HashSet<EventModel>>());
 		setPersistenceQueue(new HashSet<Long>());
 		globalEventId = 1L; //resultId CANNOT be 0
 		currentTime = null;
@@ -61,6 +65,7 @@ public class Cache {
 			
 			//populate master event map
 			Long maxId = 0L;
+			Long maxResponseId = 0L;
 			for(EventModel event : events){
 				if(event.getEventId()>maxId){
 					maxId = event.getEventId();
@@ -70,9 +75,23 @@ public class Cache {
 				Integer userId = event.getEventHost();
 				
 				//"Eager" load these 
-				Hibernate.initialize(event.getTotalResponses());
 				Hibernate.initialize(event.getInLineMessageId());
 				Hibernate.initialize(event.getChannels());
+				
+				
+				//for each response in event, map the largest responseid
+				for(RespondeeModel response : event.getTotalResponses()){
+					if(response.getId() > maxResponseId){
+						maxResponseId = response.getId();
+					}
+					HashSet<EventModel> responseSet = userRespondeeMap.get(response.getUserId());
+					if(responseSet == null){
+						responseSet = new HashSet<EventModel>();						
+					}
+					responseSet.add(event);
+					userRespondeeMap.put(response.getUserId(), responseSet);
+					
+				}
 				
 				//always add the user to the event map (even if we have no events for them)
 				HashSet<EventModel> eventSet = masterEventMap.get(userId);
@@ -115,6 +134,7 @@ public class Cache {
 				
 			}
 			globalEventId = maxId+1;
+			globalResponseId = maxResponseId + 1;
 			
 			System.out.println("Size of master event map: " + masterEventMap.size());		
 			System.out.println("Size of channel event map: " + channelEventMap.size());		
@@ -165,6 +185,16 @@ public class Cache {
 		this.channelEventMap = channelEventMap;
 	}
 
+	
+	public HashMap<Integer, HashSet<EventModel>> getUserRespondeeMap() {
+		return userRespondeeMap;
+	}
+
+	public void setUserRespondeeMap(
+			HashMap<Integer, HashSet<EventModel>> userRespondeeMap) {
+		this.userRespondeeMap = userRespondeeMap;
+	}
+	
 	public HashMap<Integer, EditModel> getInProgressEdit() {
 		return inProgressEdit;
 	}
@@ -182,6 +212,12 @@ public class Cache {
 		this.currentTime = currentTime;
 	}
 
+	public RespondeeModel registerResponse(RespondeeModel response){
+		response.setId(globalResponseId);
+		globalResponseId++;
+		return response;
+	}
+	
 	public EventModel registerEvent(EventModel event){
 		event.setEventId(globalEventId);
 		globalEventId++;

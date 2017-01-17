@@ -52,8 +52,6 @@ public class InlineQueryHandler {
 				InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 				markup.setKeyboard(event.getEventGrid());
 				qResultArticle.setThumbUrl(event.getImgur());
-				System.out.println(event.getImgur());
-//				qResultArticle.setUrl("http://i.imgur.com/GK2OaMxs.jpg");
 				qResultArticle.setReplyMarkup(markup);
 				qResultArticle.setInputMessageContent(content);
 				qResultArticle.setId(event.getEventId().toString());
@@ -87,11 +85,6 @@ public class InlineQueryHandler {
 		aQuery.setResults(list);
 		aQuery.setCacheTime(1);
 		
-//		for(InlineQueryResult result : aQuery.getResults()){
-//			InlineQueryResultArticle art = (InlineQueryResultArticle) result;
-//			System.out.println("Article ids: " + art.getId());
-//			
-//		}
 		
 		return aQuery;
 		

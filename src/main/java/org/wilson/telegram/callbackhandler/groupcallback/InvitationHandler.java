@@ -2,10 +2,8 @@ package org.wilson.telegram.callbackhandler.groupcallback;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Set;
 
-import org.hibernate.Session;
-import org.hibernate.exception.ConstraintViolationException;
 import org.telegram.telegrambots.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
@@ -17,13 +15,12 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.client.UpdateHandler;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.models.RespondeeModel;
 import org.wilson.telegram.templates.EventResponse;
 import org.wilson.telegram.util.EventBuilder;
 import org.wilson.telegram.util.EventFinder;
 import org.wilson.telegram.util.EventPersistence;
 import org.wilson.telegram.util.KeyboardBuilder;
-
-import persistence.HibernateUtil;
 
 public class InvitationHandler extends UpdateHandler {
 
@@ -120,22 +117,41 @@ public class InvitationHandler extends UpdateHandler {
 	
 	private void updateAttendees(){
 		userFirst = callBack.getFrom().getFirstName();
+		Integer userId = callBack.getFrom().getId();
 		response = callBack.getData();
-//		EventPersistence.initialize(eventModel);
-		Map<String, Boolean> responses = eventModel.getTotalResponses();
+//		Map<String, Boolean> responses = eventModel.getTotalResponses();
 
+		Set<RespondeeModel> responses = eventModel.getTotalResponses();
 		String[] responseArray = response.split(" ");
 		response = responseArray[0];
-		
+		RespondeeModel responseModel= new RespondeeModel();
+		responseModel.setFirstName(userFirst);
+		responseModel.setUserId(userId);
+		if(!responses.contains(responseModel)){
+			responses.add(responseModel);
+			responseModel = Cache.getInstance().registerResponse(responseModel);
+			EventPersistence.save(responseModel);
+		}else{
+			for(RespondeeModel item : responses){
+				if(item.equals(responseModel)){
+					responseModel = item;
+				}
+			}
+		}
+
 		if (response.equals(EventResponse.ACCEPT)) {
-				System.out.println(responses.put(userFirst, true));
+			responseModel.setAttending(true);
+			
+//				responses.put(userFirst, true);
 				
 			 
 		} else {
-				System.out.println(responses.put(userFirst, false));
+			responseModel.setAttending(false);
+//				responses.put(userFirst, false);
 
 			
 		}
+		
 	}
 	
 

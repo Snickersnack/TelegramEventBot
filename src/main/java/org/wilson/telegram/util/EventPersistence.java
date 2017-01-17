@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.wilson.telegram.client.Cache;
 import org.wilson.telegram.models.EventModel;
+import org.wilson.telegram.models.RespondeeModel;
 
 import persistence.HibernateUtil;
 
@@ -81,6 +82,28 @@ public class EventPersistence{
 	}
 	
 	
+	public static void saveOrUpdate(RespondeeModel response){
+		Session session = null;
+		try{
+			session =  HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction(); 
+			session.saveOrUpdate(response); 
+			session.getTransaction().commit();
+
+		}catch(ConstraintViolationException e){
+			System.out.println("did not consume: " + response.getId());
+			session.getTransaction().rollback();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			if (session != null){
+			session.close();
+			}
+		}
+	}
+	
 //	public static void initialize(EventModel event){
 //		Session session = null;
 //		try{
@@ -98,7 +121,30 @@ public class EventPersistence{
 //		}
 //		
 //	}
+
 	
+	public static void save(RespondeeModel response){
+		Session session = null;
+		try{
+			session =  HibernateUtil.getSessionFactory().openSession();
+			session.beginTransaction(); 
+			session.save(response); 
+			session.getTransaction().commit();
+
+		}catch(ConstraintViolationException e){
+			System.out.println("did not consume: " + response.getId());
+			session.getTransaction().rollback();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		finally{
+			if (session != null){
+			session.close();
+			}
+		}
+		
+	}
 	public static void save(EventModel event){
 		Session session = null;
 		try{

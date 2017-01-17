@@ -44,8 +44,8 @@ public class EventModel {
 	boolean showing;
 	private Set<Long> channels;
 	
-//	private Set<RespondeeModel> totalResponses;
-	private Map<String, Boolean> totalResponses;
+	private Set<RespondeeModel> totalResponses;
+//	private Map<String, Boolean> totalResponses;
 	
 	private Set<String> inLineMessageIds;
 	
@@ -55,7 +55,8 @@ public class EventModel {
 		eventGrid = new ArrayList<List<InlineKeyboardButton>>();
 		eventHost = null;
 		eventHostFirst = null;
-		totalResponses = new HashMap<String, Boolean>();
+//		totalResponses = new HashMap<String, Boolean>();
+		totalResponses = new HashSet<RespondeeModel>();
 		eventInputStage = 0;
 		eventName = null;
 		eventLocation = null;
@@ -123,15 +124,23 @@ public class EventModel {
 	}
 	
 
+//	@ElementCollection
+//	@CollectionTable(name = "total_responses", joinColumns = @JoinColumn(name = "event_id"))
+//	@MapKeyColumn(name = "user_name")
+//	@Column(name = "attending")
+//	@Cascade({CascadeType.ALL})
+//	public Map<String, Boolean> getTotalResponses() {
+//		return totalResponses;
+//	}
+
 	@ElementCollection
-	@CollectionTable(name = "total_responses", joinColumns = @JoinColumn(name = "event_id"))
-	@MapKeyColumn(name = "user_name")
-	@Column(name = "attending")
-	@Cascade({CascadeType.ALL})
-	public Map<String, Boolean> getTotalResponses() {
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinColumn(name = "event_id", referencedColumnName = "event_id")
+	@Cascade({ CascadeType.ALL })
+	public Set<RespondeeModel> getTotalResponses() {
 		return totalResponses;
 	}
-
+	
 	@ElementCollection
 	@CollectionTable(name = "inline_message", joinColumns = @JoinColumn(name = "event_id"))
 	@Column(name = "inline_message_id")
@@ -226,7 +235,11 @@ public class EventModel {
 
 
 
-	public void setTotalResponses(Map<String, Boolean> totalResponses) {
+//	public void setTotalResponses(Map<String, Boolean> totalResponses) {
+//		this.totalResponses = totalResponses;
+//	}
+	
+	public void setTotalResponses(Set<RespondeeModel> totalResponses){
 		this.totalResponses = totalResponses;
 	}
 
