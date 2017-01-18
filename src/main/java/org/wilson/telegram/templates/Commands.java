@@ -26,7 +26,7 @@ public final class Commands {
     
     public static final String HELPTEXT =  "Begin typing @" + BotConfig.BOTUSERNAME + " to start a new event"
     		+ System.getProperty("line.separator")
-    		+ System.getProperty("line.separator") + "Once you're done, share the event to a channel from the list. You will be able to see everyone who responded by using /menu in a direct message chat with @" + BotConfig.BOTUSERNAME 
+    		+ System.getProperty("line.separator") + "Once you're done, share the event to a channel by selecting your event from the list (type in @" + BotConfig.BOTUSERNAME +"again). You will be able to see everyone who responded by using /menu in a direct message chat with @" + BotConfig.BOTUSERNAME 
     		+ System.getProperty("line.separator")
     		+ System.getProperty("line.separator") + "Use /view in a channel to see all events that have been shared to that channel. Use /view in a private chat to see all events that you have accepted or declined"
     		+ System.getProperty("line.separator")

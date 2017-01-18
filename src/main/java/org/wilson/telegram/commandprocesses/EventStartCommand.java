@@ -64,11 +64,11 @@ public class EventStartCommand {
 				+ System.getProperty("line.separator")
 				+ System.getProperty("line.separator")
 
-				+ "<i>Use</i> /start <i>to start from the beginning. Use</i> /cancel <i>to exit</i>"
-				+ System.getProperty("line.separator")
-				+ System.getProperty("line.separator")
-				+ System.getProperty("line.separator")
 				+ "What is the name of your event? "
+
+				+ System.getProperty("line.separator")
+				+ System.getProperty("line.separator")
+				+ "<i>Use</i> /start <i>to start from the beginning. Use</i> /cancel <i>to exit</i>"
 				 );
 
 		return sendMessageRequest;

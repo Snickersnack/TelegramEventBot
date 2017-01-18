@@ -1,23 +1,13 @@
 package org.wilson.telegram.client;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.imageio.ImageIO;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.telegram.telegrambots.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
-import org.telegram.telegrambots.api.methods.GetFile;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.api.objects.File;
 import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
@@ -28,9 +18,7 @@ import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.inlinequeryhandler.InlineQueryHandler;
 import org.wilson.telegram.messagehandler.MessageParser;
 import org.wilson.telegram.models.EditTextCallback;
-import org.wilson.telegram.models.EventModel;
 import org.wilson.telegram.util.CacheUpdater;
-import org.wilson.telegram.util.KeyboardBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -47,7 +35,9 @@ public class UpdateHandler extends TelegramLongPollingBot {
 
 	public void onUpdateReceived(Update update) {
 		// TODO Auto-generated method stub
-		System.out.println("UPDATE FOR DEBUGGING: " + update);
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
+		System.out.println(dtf.format(now) + "update: " + update);
 		
 		try {
 			BotApiMethod<?> msg = handleUpdate(update);

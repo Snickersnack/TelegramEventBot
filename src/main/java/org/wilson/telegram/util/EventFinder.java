@@ -87,6 +87,23 @@ public class EventFinder {
 			}
 		}
 
+		
+		//remove from userRespondeeMap
+		HashMap<Integer, HashSet<EventModel>> userRespondee = Cache.getInstance().getUserRespondeeMap();
+		for(Entry<Integer, HashSet<EventModel>> item : userRespondee.entrySet()){
+			HashSet<EventModel> set = item.getValue();
+			try{
+				Iterator<EventModel> it = set.iterator();
+				while (it.hasNext()) {
+					EventModel eventModel = it.next();
+					if (eventModel.equals(event)) {
+						it.remove();
+					}
+				}	
+			}catch(Exception e){
+				System.out.println(e);
+			}
+		}
 		return found;
 	}
 	

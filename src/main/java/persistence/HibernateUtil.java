@@ -20,7 +20,6 @@ public class HibernateUtil {
 	      String port = System.getenv("RDS_PORT");
 
 	      String jdbcUrl = "jdbc:postgresql://" + hostname + ":" + port + "/" + dbName + "?user=" + userName + "&password=" + password;
-		    System.out.println(jdbcUrl);
 			cfg.getProperties().setProperty("hibernate.connection.password", password);
 			cfg.getProperties().setProperty("hibernate.connection.username", userName);
 			cfg.getProperties().setProperty("hibernate.connection.url", jdbcUrl);

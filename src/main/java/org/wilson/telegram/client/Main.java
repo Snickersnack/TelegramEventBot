@@ -8,6 +8,7 @@ import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.logging.BotLogger;
+import org.wilson.telegram.config.BotConfig;
 import org.wilson.telegram.util.DateUtil.DateScheduler;
 
 /**
@@ -23,6 +24,7 @@ public class Main {
         
     	ApiContextInitializer.init();
     	Cache.getInstance().init();
+    	System.out.println("Bot token: " + BotConfig.BOTTOKEN);
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
 
         try {

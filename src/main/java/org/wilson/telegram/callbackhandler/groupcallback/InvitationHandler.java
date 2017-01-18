@@ -138,20 +138,23 @@ public class InvitationHandler extends UpdateHandler {
 				}
 			}
 		}
-
 		if (response.equals(EventResponse.ACCEPT)) {
 			responseModel.setAttending(true);
 			
-//				responses.put(userFirst, true);
 				
 			 
 		} else {
 			responseModel.setAttending(false);
-//				responses.put(userFirst, false);
 
 			
 		}
-		
+		HashSet<EventModel> set = Cache.getInstance().getUserRespondeeMap().get(userId);
+		if(set == null){
+			set = new HashSet<EventModel>();
+			Cache.getInstance().getUserRespondeeMap().put(userId, set);
+		}
+		set.add(eventModel);
+
 	}
 	
 
