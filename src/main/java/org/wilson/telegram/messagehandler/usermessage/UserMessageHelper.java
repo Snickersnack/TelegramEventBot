@@ -201,7 +201,7 @@ public class UserMessageHelper extends MessageParser{
 		
 		if (userEvents != null) {
 			if (userEvents.size() != 0) {
-				sendMessageRequest.setText("Here's a list of events you have been invited (and have responded) to:");
+				sendMessageRequest.setText("Here's a list of events you have responded to:");
 				sendMessageRequest.setParseMode(BotConfig.MESSAGE_MARKDOWN);
 				try {
 					sendMessage(sendMessageRequest);

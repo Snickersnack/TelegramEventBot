@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
 import org.wilson.telegram.client.Cache;
+import org.wilson.telegram.config.BotConfig;
 
 public final class DateUtil {
 	
@@ -33,7 +34,7 @@ public final class DateUtil {
 				InetAddress inetAddress = InetAddress.getByName(TIME_SERVERS[tries]);
 				TimeInfo timeInfo = timeClient.getTime(inetAddress);
 				returnTime = timeInfo.getMessage().getTransmitTimeStamp().getTime();
-				LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(returnTime), ZoneId.systemDefault());
+				LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(returnTime), ZoneId.of(BotConfig.TIME_ZONE));
 				Cache.getInstance().setCurrentTime(date);
 				completed = true;
 				
